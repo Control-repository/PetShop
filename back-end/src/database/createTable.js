@@ -7,7 +7,16 @@ const productTable = `CREATE TABLE IF NOT EXISTS products (
     description TEXT,
     imageURL VARCHAR(255)
   )`;
-
+  const userTable = `
+  CREATE TABLE IF NOT EXISTS users (
+    username VARCHAR(255) PRIMARY KEY,
+    password VARCHAR(255) NOT NULL,
+    email VARCHAR(255),
+    fullname VARCHAR(255),
+    phone VARCHAR(10)
+  )
+`;
 module.exports = {
   productTable,
+  userTable
 };

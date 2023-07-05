@@ -9,7 +9,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
 app.use("/products", productRoute);
-app.use("/customer", customerRoute);
+app.use("/customers", customerRoute);
 app.use("/user", userRoute);
 
 const PORT = process.env.PORT || 3000;

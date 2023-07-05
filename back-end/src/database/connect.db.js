@@ -47,20 +47,29 @@ connection.connect((err) => {
           console.log("Error creating table ", err);
           return;
         } else {
-          console.log("Table created ");
+          console.log("Table created Products");
+        }
+      });
+      //create new table users
+      connection.query(createTable.userTable, (err) => {
+        if (err) {
+          console.log("Error creating table ", err);
+          return;
+        } else {
+          console.log("Table created Users");
         }
       });
     });
   });
 });
 
-const query = (sql, callback) => {
-  connection.query(sql, (err, result) => {
+const query = (sql, value, callback) => {
+  connection.query(sql, value, (err, results, fields) => {
     if (err) {
       callback(err, null);
       return;
     }
-    callback(null, result);
+    callback(null, results, fields);
   });
 };
 

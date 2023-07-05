@@ -2,14 +2,19 @@ const myConnection = require("../database/connect.db");
 
 //get All products
 const getAllProducts = (req, res) => {
-  const query = "SELECT * from products";
+  let query = `SELECT * from products`;
+  let search = req.query.search;
 
-  myConnection.query(query, (err, results) => {
+  if (search) {
+    query += ` WHERE name LIKE '%${search}%'`;
+  }
+
+  myConnection.query(query, [], (err, results) => {
     if (err) {
       console.log("Error getting products: ", err);
       return res.status(500).json({ error: "Failed to get product" });
     }
-
+    console.log(results);
     return res.json(results);
   });
 };
@@ -24,12 +29,14 @@ const insertProduct = (req, res) => {
   }
 
   const query = `INSERT INTO products(name, category, price, quantity, description, imageURL) VALUE 
-  ('${name}','${category}',${price},${quantity},'${description}','${imageURL}')`;
+  (?,?,?,?,?,?)`;
 
-  myConnection.query(query, (err, result) => {
+  const values = [name, category, price, quantity, description, imageURL];
+
+  myConnection.query(query, values, (err, result) => {
     if (err) {
       console.log("Failed to insert prodcut", err);
-      return res.status(500).json({ error: "Failed to insert prodcut" });
+      return res.status(500).json({ message: "Failed to insert prodcut" });
     }
     res
       .status(200)
@@ -53,7 +60,7 @@ const updateProduct = (req, res) => {
   myConnection.query(query, (err, result) => {
     if (err) {
       console.log("Failed to insert prodcut", err);
-      return res.status(500).json({ error: "Failed to insert prodcut" });
+      return res.status(500).json({ message: "Failed to insert prodcut" });
     }
     res
       .status(200)
