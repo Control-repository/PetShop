@@ -1,10 +1,14 @@
 const app = require("express")();
+const bodyParser = require("body-parser");
 
 const productRoute = require("./src/routes/productRoute");
 const customerRoute = require("./src/routes/customerRoute");
 const userRoute = require("./src/routes/userRoute");
 
-app.use("/product", productRoute);
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.json());
+
+app.use("/products", productRoute);
 app.use("/customer", customerRoute);
 app.use("/user", userRoute);
 
