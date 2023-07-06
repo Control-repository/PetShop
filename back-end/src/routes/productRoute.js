@@ -8,5 +8,10 @@ route.get("/all", (req, res) => {
 route.post("/insert", (req, res) => {
   productController.insertProduct(req, res);
 });
-
+route.post("/insert/data", (req, res) => {
+  productController.insertProducts(req, res);
+});
+route.get("/get/:id", (req, res) => {
+  productController.getProduct(req, res);
+});
 module.exports = route;

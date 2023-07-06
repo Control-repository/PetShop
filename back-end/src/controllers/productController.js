@@ -12,7 +12,7 @@ const getAllProducts = (req, res) => {
   myConnection.query(query, [], (err, results) => {
     if (err) {
       console.log("Error getting products: ", err);
-      return res.status(500).json({ error: "Failed to get product" });
+      return res.status(500).json({ message: "Failed to get product" });
     }
     console.log(results);
     return res.json(results);
@@ -24,7 +24,7 @@ const insertProduct = (req, res) => {
   const { name, category, price, quantity, description, imageURL } = req.body;
 
   if (!name || !category || !price || !quantity) {
-    res.status(400).json({ error: "Missing required fields" });
+    res.status(400).json({ message: "Missing required fields" });
     return;
   }
 
@@ -38,10 +38,7 @@ const insertProduct = (req, res) => {
       console.log("Failed to insert prodcut", err);
       return res.status(500).json({ message: "Failed to insert prodcut" });
     }
-    res
-      .status(200)
-      .json({ message: "Product inserted successfully", product: result });
-    console.log(result);
+    res.status(200).json({ message: "Product inserted successfully" });
   });
 };
 
@@ -51,7 +48,7 @@ const updateProduct = (req, res) => {
     req.body;
 
   if (!name || !category || !price || !quantity) {
-    res.status(400).json({ error: "Missing required fields" });
+    res.status(400).json({ message: "Missing required fields" });
     return;
   }
 
@@ -62,25 +59,45 @@ const updateProduct = (req, res) => {
       console.log("Failed to insert prodcut", err);
       return res.status(500).json({ message: "Failed to insert prodcut" });
     }
-    res
-      .status(200)
-      .json({ message: "Product inserted successfully", product: result });
+    res.status(200).json({ message: "Product inserted successfully" });
     console.log(result);
   });
 };
 
-// insert databse example
-// const insertProducts = (req, res) => {
-//   myConnection.insertProducts((err, results) => {
-//     if (err) {
-//       console.log("Error insert products: ", err);
-//       return res.status(500).json({ err: "Not insert products" });
-//     }
+//get one product
+const getProduct = (req, res) => {
+  const  id  = req.params.id;
+  const searchQuery = `SELECT * from products WHERE id =?`;
 
-//     return res.json(results);
-//   });
-// };
+  myConnection.query(searchQuery, [id], (err, results) => {
+    if (err) {
+      console.error("Error getting product:", err);
+      res.status(500).json({ message: "Error getting product" });
+      return;
+    }
+
+    if (!results) {
+      res.status(404).json({ message: "Product not found" });
+      return;
+    }
+
+    res.json(results);
+  });
+};
+// insert databse example
+const insertProducts = (req, res) => {
+  myConnection.insertProducts((err, results) => {
+    if (err) {
+      console.log("Error insert products: ", err);
+      return res.status(500).json({ message: "Not insert products" });
+    }
+
+    return res.json(results);
+  });
+};
 module.exports = {
   getAllProducts,
   insertProduct,
+  insertProducts,
+  getProduct,
 };

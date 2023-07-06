@@ -27,7 +27,7 @@ const insertUser = (req, res) => {
   const { username, password, fullname, email, phone } = req.body;
 
   if (!username || !password) {
-    res.status(400).json({ error: "Missing required fields" });
+    res.status(400).json({ message: "Missing required fields" });
     return;
   }
 
@@ -42,7 +42,6 @@ const insertUser = (req, res) => {
     }
     res.status(200).json({
       message: "User inserted successfully",
-      user: result,
     });
   });
 };

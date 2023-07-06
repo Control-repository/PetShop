@@ -76,27 +76,28 @@ const query = (sql, value, callback) => {
 process.on("exit", () => {
   connection.end();
 });
-
-module.exports = { connection, query };
-
 // Insert the products into the MySQL database
-// for (const product of products) {
-//   const sql =
-//     "INSERT INTO products (name, category, price, quantity, description, imageURL) VALUES (?, ?, ?, ?, ?, ?)";
-//   const values = [
-//     product.name,
-//     product.category,
-//     product.price,
-//     product.quantity,
-//     product.description,
-//     product.imageURL,
-//   ];
+const insertProducts = () => {
+  for (const product of products) {
+    const sql =
+      "INSERT INTO products (name, category, price, quantity, description, imageURL) VALUES (?, ?, ?, ?, ?, ?)";
+    const values = [
+      product.name,
+      product.category,
+      product.price,
+      product.quantity,
+      product.description,
+      product.imageURL,
+    ];
 
-//   connection.query(sql, values, (err, result) => {
-//     if (err) {
-//       console.log("not insert");
-//       return;
-//     }
-//     console.log("insert complete");
-//   });
-// }
+    connection.query(sql, values, (err, result) => {
+      if (err) {
+        console.log(err);
+        return;
+      }
+      console.log(result);
+    });
+  }
+};
+
+module.exports = { connection, query, insertProducts };
