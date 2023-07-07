@@ -1,6 +1,6 @@
 const mysql = require("mysql");
 const products = require("./database.example.js");
-const createTable = require("./createTable.js");
+const createTable = require("../untils/createTable.js");
 const dotenv = require("dotenv");
 
 dotenv.config();
@@ -59,6 +59,14 @@ connection.connect((err) => {
           console.log("Table created Users");
         }
       });
+      connection.query(createTable.reset_pass_table,(err)=>{
+        if (err) {
+          console.log("Error creating table ", err);
+          return;
+        } else {
+          console.log("Table created Token");
+        }
+      })
     });
   });
 });

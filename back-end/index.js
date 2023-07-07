@@ -3,14 +3,14 @@ const bodyParser = require("body-parser");
 
 const productRoute = require("./src/routes/productRoute");
 const customerRoute = require("./src/routes/customerRoute");
-const userRoute = require("./src/routes/userRoute");
+const auth = require("./src/routes/authRoute");
 
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
 app.use("/products", productRoute);
 app.use("/customers", customerRoute);
-app.use("/user", userRoute);
+app.use("/auth", auth);
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
