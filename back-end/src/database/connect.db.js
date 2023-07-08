@@ -40,16 +40,6 @@ connection.connect((err) => {
         return;
       }
       console.log("Switched to the database");
-
-      //Create new table products
-      connection.query(createTable.productTable, (err) => {
-        if (err) {
-          console.log("Error creating table ", err);
-          return;
-        } else {
-          console.log("Table created Products");
-        }
-      });
       //create new table users
       connection.query(createTable.userTable, (err) => {
         if (err) {
@@ -59,14 +49,24 @@ connection.connect((err) => {
           console.log("Table created Users");
         }
       });
-      connection.query(createTable.reset_pass_table,(err)=>{
+      //Create new table products
+      connection.query(createTable.productTable, (err) => {
+        if (err) {
+          console.log("Error creating table ", err);
+          return;
+        } else {
+          console.log("Table created Products");
+        }
+      });
+
+      connection.query(createTable.reset_pass_table, (err) => {
         if (err) {
           console.log("Error creating table ", err);
           return;
         } else {
           console.log("Table created Token");
         }
-      })
+      });
     });
   });
 });
@@ -88,7 +88,7 @@ process.on("exit", () => {
 const insertProducts = () => {
   for (const product of products) {
     const sql =
-      "INSERT INTO products (name, category, price, quantity, description, imageURL) VALUES (?, ?, ?, ?, ?, ?)";
+      "INSERT INTO products (name, category, price, quantity, description, imageURL,user_username) VALUES (?, ?, ?, ?, ?, ?,?)";
     const values = [
       product.name,
       product.category,
@@ -96,6 +96,7 @@ const insertProducts = () => {
       product.quantity,
       product.description,
       product.imageURL,
+      product.user_username,
     ];
 
     connection.query(sql, values, (err, result) => {

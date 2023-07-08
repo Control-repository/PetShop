@@ -1,7 +1,11 @@
 package com.example.petshop.models;
 
+import com.google.gson.annotations.SerializedName;
+
 public class ResetPasswordRequest {
+    @SerializedName("token")
     private String token;
+    @SerializedName("newPassword")
     private String newPassword;
 
     public ResetPasswordRequest(){}

@@ -1,6 +1,9 @@
 package com.example.petshop.models;
 
+import com.google.gson.annotations.SerializedName;
+
 public class AppMessage {
+    @SerializedName("message")
     private String message;
 
     public String getMessage() {

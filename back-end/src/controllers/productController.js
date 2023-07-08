@@ -2,19 +2,27 @@ const myConnection = require("../database/connect.db");
 
 //get All products
 const getAllProducts = (req, res) => {
-  let query = `SELECT * from products`;
+  let query = `SELECT * from products WHERE user_username=?`;
   let search = req.query.search;
 
-  if (search) {
-    query += ` WHERE name LIKE '%${search}%'`;
-  }
+  const user = req.user;
 
-  myConnection.query(query, [], (err, results) => {
+  myConnection.query(query, [user.username], (err, results) => {
     if (err) {
       console.log("Error getting products: ", err);
-      return res.status(500).send("Failed to get product");
+      return res.status(500).json({ message: "Failed to get product" });
     }
-    return res.json(results);
+
+    if (search) {
+      query += ` AND name LIKE '%${search}%'`;
+    }
+    myConnection.query(query, [], (err, results) => {
+      if (err) {
+        console.log("Error getting products: ", err);
+        return res.status(500).json({ message: "Failed to get product" });
+      }
+      return res.json({ products: results });
+    });
   });
 };
 
@@ -23,7 +31,7 @@ const insertProduct = (req, res) => {
   const { name, category, price, quantity, description, imageURL } = req.body;
 
   if (!name || !category || !price || !quantity) {
-    res.status(400).send("Missing required fields");
+    res.status(400).json({ message: "Missing required fields" });
     return;
   }
 
@@ -35,7 +43,7 @@ const insertProduct = (req, res) => {
   myConnection.query(query, values, (err, result) => {
     if (err) {
       console.log("Failed to insert prodcut", err);
-      return res.status(500).send("Failed to insert prodcut");
+      return res.status(500).json({ message: "Failed to insert prodcut" });
     }
     res.status(200).json({ message: "Product inserted successfully" });
   });
@@ -47,7 +55,7 @@ const updateProduct = (req, res) => {
     req.body;
 
   if (!name || !category || !price || !quantity) {
-    res.status(400).send("Missing required fields");
+    res.status(400).json({ message: "Missing required fields" });
     return;
   }
 
@@ -56,7 +64,7 @@ const updateProduct = (req, res) => {
   myConnection.query(query, (err, result) => {
     if (err) {
       console.log("Failed to insert prodcut", err);
-      return res.status(500).send("Failed to insert prodcut");
+      return res.status(500).json({ message: "Failed to insert prodcut" });
     }
     res.status(200).json({ message: "Product inserted successfully" });
     console.log(result);
@@ -71,12 +79,12 @@ const getProduct = (req, res) => {
   myConnection.query(searchQuery, [id], (err, results) => {
     if (err) {
       console.error("Error getting product:", err);
-      res.status(500).send("Error getting product");
+      res.status(500).json({ message: "Error getting product" });
       return;
     }
 
     if (!results) {
-      res.status(404).send("Product not found");
+      res.status(404).json({ message: "Product not found" });
       return;
     }
 
@@ -85,18 +93,26 @@ const getProduct = (req, res) => {
 };
 // insert databse example
 const insertProducts = (req, res) => {
-  myConnection.insertProducts((err, results) => {
+  myConnection.insertProducts(req, res);
+};
+//delete product
+const deleteAllProduct = (req, res) => {
+  const query = `DELETE FROM products`;
+  myConnection.query(query, [], (err, result) => {
     if (err) {
-      console.log("Error insert products: ", err);
-      return res.status(500).json({ message: "Not insert products" });
+      return res.status(500).json({ message: "Failed to delete Products" });
     }
 
-    return res.json(results);
+    return res
+      .status(200)
+      .json({ message: "All products deleted successfully" });
   });
 };
+
 module.exports = {
   getAllProducts,
   insertProduct,
   insertProducts,
   getProduct,
+  deleteAllProduct,
 };

@@ -16,7 +16,6 @@ const checkAuth = (username, password) => {
       }
 
       if (result.length > 0) {
-        console.log(result);
         resolve(result[0]);
       } else {
         resolve(null);
@@ -30,21 +29,32 @@ const insertAuth = (req, res) => {
   const { username, password, fullname, email, phone } = req.body;
 
   if (!username || !password) {
-    res.status(400).send("Missing required fields");
-    return;
+    return res.status(400).json({message:"Missing required fields"});
   }
 
-  let query = `INSERT INTO users(username,password,email,fullname,phone)
-    VALUE(?,?,?,?,?)`;
-  const values = [username, password, email, fullname, phone];
-
-  myConnection.query(query, values, (err, result) => {
+  //Check user exists
+  const checkQuery = `SELECT * from users WHERE username = ?`;
+  myConnection.query(checkQuery, [username], (err, results) => {
     if (err) {
-      console.log("Failed to insert user", err);
-      return res.status(500).send("Failed to insert prodcut");
+      return res.status(500).json({ message: "Error checking username" });
     }
-    res.status(200).json({
-      message: "User inserted successfully",
+
+    if (results.length > 0) {
+      return res.status(409).json({ message: "username already exists" });
+    }
+
+    //insert user
+    let query = `INSERT INTO users(username,password,email,fullname,phone)
+    VALUE(?,?,?,?,?)`;
+    const values = [username, password, email, fullname, phone];
+
+    myConnection.query(query, values, (err, result) => {
+      if (err) {
+        return res.status(500).json({message:"Failed register user"});
+      }
+      res.status(200).json({
+        message: "User inserted successfully",
+      });
     });
   });
 };
@@ -55,12 +65,10 @@ const resetPassword = (req, res) => {
 
   //Check
   if (!token || !newPassword) {
-    res.status(401).send("Token or new Password is missing");
-    return;
+    return res.status(401).json({message:"Token or new Password is missing"});
   }
   if (token !== process.env.RESET_PASSWORD_TOKEN) {
-    res.status(401).send("Invalid token");
-    return;
+    return res.status(401).json({message:"Invalid token"});
   }
 
   //Check token
@@ -68,14 +76,12 @@ const resetPassword = (req, res) => {
   myConnection.query(selectQuery, [token], (err, results) => {
     if (err) {
       console.error("Error retrieving reset token:", err);
-      res.status(500).send("Error retrieving reset token");
-      return;
+      return res.status(500).json({message:"Error retrieving reset token"});
     }
 
     //If true
     if (results.length > 0) {
-      res.status(404).send("Invalid reset token");
-      return;
+      return res.status(404).json({message:"Invalid reset token"});
     }
 
     const resetToken = results[0];
@@ -86,19 +92,17 @@ const resetPassword = (req, res) => {
       [newPassword, resetToken.use_username],
       (err, result) => {
         if (err) {
-          res.status(500).send("Error resetting password");
-          return;
+          return res.status(500).json({ message: "Error resetting password"});
         }
 
         const query = `DELETE FROM reset_password_token WHERE token =?`;
         myConnection.query(query, [token], (err, result) => {
           if (err) {
             console.error("Error deleting reset token:", err);
-            res.status(500).send("Error deleting reset token");
-            return;
+            return res.status(500).json({ message: "Error deleting reset token"});
           }
 
-          res.json({ message: "Password reset successfully" });
+          return res.json({ message: "Password reset successfully" });
         });
       }
     );

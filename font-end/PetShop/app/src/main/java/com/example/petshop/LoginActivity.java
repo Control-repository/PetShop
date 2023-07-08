@@ -1,24 +1,31 @@
 package com.example.petshop;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.petshop.models.AppMessage;
 import com.example.petshop.models.SignInMessage;
 import com.example.petshop.models.User;
 import com.example.petshop.untils.ApiService;
 import com.example.petshop.untils.RetroClient;
 import com.google.android.material.textfield.TextInputLayout;
+import com.google.gson.Gson;
 
 import java.io.IOException;
+import java.util.Objects;
 
+import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -26,23 +33,31 @@ import retrofit2.Response;
 public class LoginActivity extends AppCompatActivity {
     private TextInputLayout ip_username,ip_password;
     private Button btn_SignIn;
-    private TextView tv_miss_password;
+    private TextView tv_miss_password,tv_register;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
-
-
+        //mapping
         ip_password = findViewById(R.id.ip_password);
         ip_username = findViewById(R.id.ip_username);
         btn_SignIn = findViewById(R.id.btn_SignIn);
         tv_miss_password = findViewById(R.id.tv_miss_password);
+        tv_register = findViewById(R.id.tv_register);
 
-        btn_SignIn.setOnClickListener(v->{
-            clickSignIn(v);
+        btn_SignIn.setOnClickListener(this::clickSignIn);
+
+        tv_miss_password.setOnClickListener(v->{
+            startActivity(new Intent(LoginActivity.this,ResetPassActivity.class));
+            finish();
         });
+        tv_register.setOnClickListener(v->{
+            startActivity(new Intent(LoginActivity.this,RegisterActivity.class));
+            finish();
+        });
+
     }
 
     private void clickSignIn(View v) {
@@ -75,32 +90,34 @@ public class LoginActivity extends AppCompatActivity {
                 @Override
                 public void onResponse(Call<SignInMessage> call, Response<SignInMessage> response) {
                     dialog.dismiss();
-                    Log.i("CHECK RESPONSE", response.toString());
                     if(response.isSuccessful()){
-                        SignInMessage signInMessage = response.body();
-                        User user = signInMessage.getUser();
-                            if (user != null) {
-                                Bundle bundle = new Bundle();
-                                bundle.putString("username", user.getUsername());
-                                bundle.putString("password", user.getUsername());
-                                bundle.putString("email", user.getUsername());
-                                bundle.putString("fullname", user.getUsername());
-                                bundle.putString("phone", user.getUsername());
-                                Toast.makeText(LoginActivity.this,"Login complete!", Toast.LENGTH_SHORT).show();
-                                Intent intent = new Intent(LoginActivity.this, MainActivity.class);
-                                intent.putExtras(bundle);
-                                startActivity(intent);
-                                finish();
-                            }
-                    }else {
-                        String errorMessage = "";
-                        try {
-                            errorMessage = response.errorBody().string();
-                        }catch (IOException e){
-                            e.printStackTrace();
-                        }
-                        Toast.makeText(getApplicationContext(), errorMessage, Toast.LENGTH_SHORT).show();
 
+                        SignInMessage signInMessage = response.body();
+                        assert signInMessage != null;
+                        User user = signInMessage.getUser();
+
+                        if (user != null) {
+                            Bundle bundle = new Bundle();
+                            bundle.putString("username", user.getUsername());
+                            bundle.putString("password", user.getUsername());
+                            bundle.putString("email", user.getUsername());
+                            bundle.putString("fullname", user.getUsername());
+                            bundle.putString("phone", user.getUsername());
+                            Toast.makeText(LoginActivity.this,"Login complete!", Toast.LENGTH_SHORT).show();
+                            Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+                            intent.putExtras(bundle);
+                            startActivity(intent);
+                            finish();
+                        }
+                    }
+                    ResponseBody errorBody = response.errorBody();
+                    try {
+                        Gson gson = new Gson();
+                        AppMessage message = gson.fromJson(errorBody.string(),AppMessage.class);
+                        String errorMessage = message.getMessage();
+                        Toast.makeText(getApplicationContext(), errorMessage, Toast.LENGTH_SHORT).show();
+                    }catch (IOException e){
+                        e.printStackTrace();
                     }
                 }
 

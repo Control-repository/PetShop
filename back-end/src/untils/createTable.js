@@ -5,7 +5,9 @@ const productTable = `CREATE TABLE IF NOT EXISTS products (
     price DECIMAL(10, 2) NOT NULL,
     quantity INT NOT NULL,
     description TEXT,
-    imageURL VARCHAR(255)
+    imageURL VARCHAR(255),
+    user_username VARCHAR(255) NOT NULL,
+    FOREIGN KEY (user_username) REFERENCES users(username) 
   )`;
 const userTable = `
   CREATE TABLE IF NOT EXISTS users (
@@ -29,5 +31,5 @@ const reset_pass_table = `
 module.exports = {
   productTable,
   userTable,
-  reset_pass_table
+  reset_pass_table,
 };

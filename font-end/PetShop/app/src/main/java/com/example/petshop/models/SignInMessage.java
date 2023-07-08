@@ -1,7 +1,11 @@
 package com.example.petshop.models;
 
+import com.google.gson.annotations.SerializedName;
+
 public class SignInMessage {
+    @SerializedName("message")
     private String message;
+    @SerializedName("user")
     private User user;
     public SignInMessage(String message) {
         this.message = message;
