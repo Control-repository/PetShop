@@ -7,11 +7,22 @@ public class ResetPasswordRequest {
     private String token;
     @SerializedName("newPassword")
     private String newPassword;
+    @SerializedName("username")
+    private String username;
+
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
 
     public ResetPasswordRequest(){}
-    public ResetPasswordRequest(String token, String newPassword) {
+    public ResetPasswordRequest(String token, String newPassword,String username) {
         this.token = token;
         this.newPassword = newPassword;
+        this.username = username;
     }
 
     public String getToken() {

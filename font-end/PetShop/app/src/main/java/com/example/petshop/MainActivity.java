@@ -2,13 +2,21 @@ package com.example.petshop;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.view.Menu;
 
+import com.example.petshop.models.User;
+import com.example.petshop.ui.CustomerFragment;
+import com.example.petshop.ui.HomeFragment;
+import com.example.petshop.ui.PasswordFragment;
+import com.example.petshop.ui.ProductFragment;
+import com.example.petshop.ui.UserFragment;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.navigation.NavigationView;
 
 import androidx.navigation.NavController;
+import androidx.navigation.NavDirections;
 import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
@@ -16,6 +24,8 @@ import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.petshop.databinding.ActivityMainBinding;
+
+import java.util.Objects;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -40,12 +50,23 @@ public class MainActivity extends AppCompatActivity {
         NavigationView navigationView = binding.navView;
         // Passing each menu ID as a set of Ids because each
         // menu should be considered as top level destinations.
+        NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_content_main);
+        //get User when login successfully
+        Intent intent = getIntent();
+        if(intent !=null) {
+            Bundle bundle = intent.getExtras();
+            Log.i("CHECK Bundle",((User)bundle.getSerializable("User")).toString());
+            navController.setGraph(R.navigation.mobile_navigation, bundle);
+        }
+
+
         mAppBarConfiguration = new AppBarConfiguration.Builder(
                 R.id.nav_home, R.id.nav_product, R.id.nav_customer, R.id.nav_password, R.id.nav_user,R.id.nav_logout,R.id.nav_exit
         )
                 .setOpenableLayout(drawer)
                 .build();
-        NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_content_main);
+
+
         //logout account or exit app
         navigationView.setNavigationItemSelectedListener(item -> {
             if (item.getItemId() == R.id.nav_logout) {

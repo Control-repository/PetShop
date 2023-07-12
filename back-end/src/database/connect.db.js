@@ -72,12 +72,12 @@ connection.connect((err) => {
 });
 
 const query = (sql, value, callback) => {
-  connection.query(sql, value, (err, results, fields) => {
+  connection.query(sql, value, (err, results) => {
     if (err) {
       callback(err, null);
       return;
     }
-    callback(null, results, fields);
+    callback(null, results);
   });
 };
 
@@ -109,4 +109,4 @@ const insertProducts = () => {
   }
 };
 
-module.exports = { connection, query, insertProducts };
+module.exports = { query, insertProducts };

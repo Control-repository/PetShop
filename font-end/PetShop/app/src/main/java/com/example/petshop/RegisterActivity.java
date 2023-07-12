@@ -17,6 +17,7 @@ import android.widget.Toast;
 import com.example.petshop.models.AppMessage;
 import com.example.petshop.models.User;
 import com.example.petshop.untils.ApiService;
+import com.example.petshop.untils.CheckInput;
 import com.example.petshop.untils.RetroClient;
 import com.google.android.material.textfield.TextInputLayout;
 import com.google.gson.Gson;
@@ -76,9 +77,9 @@ public class RegisterActivity extends AppCompatActivity {
         String email = ip_email.getEditText().getText().toString().trim();
         String confirm_password = ip_confirm_password.getEditText().getText().toString().trim();
 
-        if(validateInput(username,ip_username)&&validateInput(fullname,ip_fullname)
-            &&validateInput(password,ip_password)&&validateInput(email,ip_email)
-                &&validateInput(confirm_password,ip_confirm_password)){
+        if(CheckInput.validateInput(username,ip_username)&&CheckInput.validateInput(fullname,ip_fullname)
+            &&CheckInput.validateInput(password,ip_password)&&CheckInput.validateInput(email,ip_email)
+                &&CheckInput.validateInput(confirm_password,ip_confirm_password)){
             if(!password.equals(confirm_password)){
                 ip_confirm_password.setError("Mật khẩu không chính xác");
             }else{
@@ -138,16 +139,6 @@ public class RegisterActivity extends AppCompatActivity {
                     Toast.makeText(RegisterActivity.this, "Register failed!", Toast.LENGTH_SHORT).show();
                 }
             });
-        }
-    }
-
-    private boolean validateInput(String str,TextInputLayout input){
-        if(TextUtils.isEmpty(str)){
-            input.setError("Vui lòng nhập dữ liệu");
-            return false;
-        }else{
-            input.setError(null);
-            return true;
         }
     }
 

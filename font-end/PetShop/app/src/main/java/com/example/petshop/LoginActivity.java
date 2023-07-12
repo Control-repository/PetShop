@@ -23,6 +23,7 @@ import com.google.android.material.textfield.TextInputLayout;
 import com.google.gson.Gson;
 
 import java.io.IOException;
+import java.io.Serializable;
 import java.util.Objects;
 
 import okhttp3.ResponseBody;
@@ -98,27 +99,25 @@ public class LoginActivity extends AppCompatActivity {
 
                         if (user != null) {
                             Bundle bundle = new Bundle();
-                            bundle.putString("username", user.getUsername());
-                            bundle.putString("password", user.getUsername());
-                            bundle.putString("email", user.getUsername());
-                            bundle.putString("fullname", user.getUsername());
-                            bundle.putString("phone", user.getUsername());
+                            bundle.putSerializable("User", (Serializable) user);
                             Toast.makeText(LoginActivity.this,"Login complete!", Toast.LENGTH_SHORT).show();
                             Intent intent = new Intent(LoginActivity.this, MainActivity.class);
                             intent.putExtras(bundle);
                             startActivity(intent);
                             finish();
                         }
+                    }else{
+                        ResponseBody errorBody = response.errorBody();
+                        try {
+                            Gson gson = new Gson();
+                            AppMessage message = gson.fromJson(errorBody.string(),AppMessage.class);
+                            String errorMessage = message.getMessage();
+                            Toast.makeText(getApplicationContext(), errorMessage, Toast.LENGTH_SHORT).show();
+                        }catch (IOException e){
+                            e.printStackTrace();
+                        }
                     }
-                    ResponseBody errorBody = response.errorBody();
-                    try {
-                        Gson gson = new Gson();
-                        AppMessage message = gson.fromJson(errorBody.string(),AppMessage.class);
-                        String errorMessage = message.getMessage();
-                        Toast.makeText(getApplicationContext(), errorMessage, Toast.LENGTH_SHORT).show();
-                    }catch (IOException e){
-                        e.printStackTrace();
-                    }
+
                 }
 
                 @Override

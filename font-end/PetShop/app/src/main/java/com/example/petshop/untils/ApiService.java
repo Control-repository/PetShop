@@ -24,7 +24,7 @@ public interface ApiService {
     @POST("/auth/signin")
     Call<SignInMessage> signIn(@Field("username") String username, @Field("password") String password);
 
-    @POST("/auth/reset-password")
+    @PUT("/auth/reset-password")
     Call<AppMessage> resetPassword(@Body ResetPasswordRequest request);
     @POST("/auth/register")
     Call<AppMessage> registerUser(@Body User user);
