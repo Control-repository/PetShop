@@ -3,4 +3,8 @@
     <style name="input_layout" parent="Widget.MaterialComponents.TextInputLayout.OutlinedBox">
         <item name="borderRound">5dp</item>
     </style>
+
+    <style name="custom_search_view" parent="Widget.AppCompat.SearchView">
+        <item name="colorControlActivated">@color/dark_gray</item>
+    </style>
 </resources>

@@ -10,28 +10,32 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
 
 
 import com.example.petshop.R;
 import com.example.petshop.models.User;
+import com.example.petshop.viewmodel.UserViewModel;
 
 public class HomeFragment extends Fragment {
     public HomeFragment(){}
     User user;
-
+    UserViewModel userViewModel;
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
-
-        return inflater.inflate(R.layout.fragment_home,container,false);
+        View view = inflater.inflate(R.layout.fragment_home,container,false);
+        userViewModel = new ViewModelProvider(requireActivity()).get(UserViewModel.class);
+        userViewModel.getData().observe(getActivity(),item -> {
+            user = item;
+            Log.i("CHECK USER FRAGMENT",user.toString());
+        });
+        return view;
     }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        if(getArguments()!=null){
-            user =(User) getArguments().getSerializable("User");
-            Log.i("CHECK USER FRAGMENT "+ HomeFragment.class.getSimpleName(), user.toString());
-        }
+
     }
 
     @Override

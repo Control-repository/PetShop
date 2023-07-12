@@ -12,9 +12,11 @@ import com.example.petshop.ui.HomeFragment;
 import com.example.petshop.ui.PasswordFragment;
 import com.example.petshop.ui.ProductFragment;
 import com.example.petshop.ui.UserFragment;
+import com.example.petshop.viewmodel.UserViewModel;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.navigation.NavigationView;
 
+import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavController;
 import androidx.navigation.NavDirections;
 import androidx.navigation.Navigation;
@@ -30,7 +32,7 @@ import java.util.Objects;
 public class MainActivity extends AppCompatActivity {
 
     private AppBarConfiguration mAppBarConfiguration;
-
+    UserViewModel userViewModel;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -50,13 +52,15 @@ public class MainActivity extends AppCompatActivity {
         NavigationView navigationView = binding.navView;
         // Passing each menu ID as a set of Ids because each
         // menu should be considered as top level destinations.
-        NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_content_main);
         //get User when login successfully
         Intent intent = getIntent();
+        userViewModel = new ViewModelProvider(this).get(UserViewModel.class);
         if(intent !=null) {
             Bundle bundle = intent.getExtras();
-            Log.i("CHECK Bundle",((User)bundle.getSerializable("User")).toString());
-            navController.setGraph(R.navigation.mobile_navigation, bundle);
+            User user =(User) bundle.getSerializable("User");
+            if(user!=null){
+                userViewModel.setData(user);
+            }
         }
 
 
@@ -66,6 +70,7 @@ public class MainActivity extends AppCompatActivity {
                 .setOpenableLayout(drawer)
                 .build();
 
+        NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_content_main);
 
         //logout account or exit app
         navigationView.setNavigationItemSelectedListener(item -> {
