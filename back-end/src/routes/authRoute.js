@@ -17,7 +17,10 @@ route.post("/signin", async (req, res) => {
         sameSite: "none",
         // secure: true,
       });
-      return res.status(200).json({ message: "Login complete!", user: user });
+      req.user = user;
+      return res
+        .status(200)
+        .json({ message: "Login complete!", token: token, user: user });
     } else {
       return res
         .status(401)

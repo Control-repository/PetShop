@@ -15,11 +15,14 @@
         android:orientation="vertical"
         android:layout_gravity="center"
         android:paddingHorizontal="4dp">
+
         <ImageView
+            android:id="@+id/image_product"
             android:layout_width="120dp"
             android:layout_height="120dp"
-            android:src="@drawable/pet_shop"
-            android:layout_margin="4dp"/>
+            android:layout_margin="4dp"
+            android:scaleType="fitXY"
+            android:src="@drawable/pet_shop" />
             <TextView
                 android:id="@+id/tv_product_name"
                 android:layout_width="wrap_content"

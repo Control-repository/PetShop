@@ -96,4 +96,18 @@ public class Product {
     public void setUser_username(String user_username) {
         this.user_username = user_username;
     }
+
+    @Override
+    public String toString() {
+        return "Product{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", category='" + category + '\'' +
+                ", price=" + price +
+                ", quantity=" + quantity +
+                ", description='" + description + '\'' +
+                ", imageURL='" + imageURL + '\'' +
+                ", user_username='" + user_username + '\'' +
+                '}';
+    }
 }

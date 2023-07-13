@@ -3,7 +3,7 @@ const route = require("express")();
 const productController = require("../controllers/productController");
 const protect = require("../middleware/authMiddleware");
 
-route.get("/all", protect, productController.getAllProducts);
+route.get("/all",protect, productController.getAllProducts);
 route.post("/insert", protect, productController.insertProduct);
 route.post("/insert/data", protect, productController.insertProducts);
 route.get("/get/:id", protect, productController.getProduct);

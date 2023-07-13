@@ -1,21 +1,19 @@
 package com.example.petshop;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
 
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.petshop.models.AppMessage;
-import com.example.petshop.models.SignInMessage;
 import com.example.petshop.models.User;
 import com.example.petshop.untils.ApiService;
 import com.example.petshop.untils.RetroClient;
@@ -23,8 +21,6 @@ import com.google.android.material.textfield.TextInputLayout;
 import com.google.gson.Gson;
 
 import java.io.IOException;
-import java.io.Serializable;
-import java.util.Objects;
 
 import okhttp3.ResponseBody;
 import retrofit2.Call;
@@ -83,29 +79,38 @@ public class LoginActivity extends AppCompatActivity {
         if(!username.isEmpty()&& !password.isEmpty()){
             dialog.setMessage("Loading...");
             dialog.show();
-            ApiService apiService = RetroClient.getApiService();
+            //truyền context
+            RetroClient.setContext(getApplicationContext());
 
+            ApiService apiService = RetroClient.getApiService();
             //Calling JSOn
-            Call<SignInMessage> call = apiService.signIn(username,password);
-            call.enqueue(new Callback<SignInMessage>() {
+            Call<AppMessage> call = apiService.signIn(username,password);
+            call.enqueue(new Callback<AppMessage>() {
                 @Override
-                public void onResponse(Call<SignInMessage> call, Response<SignInMessage> response) {
+                public void onResponse(Call<AppMessage> call, Response<AppMessage> response) {
                     dialog.dismiss();
                     if(response.isSuccessful()){
 
-                        SignInMessage signInMessage = response.body();
+                        AppMessage signInMessage = response.body();
                         assert signInMessage != null;
                         User user = signInMessage.getUser();
 
-                        if (user != null) {
+                        if(response.body().getToken()!=null && user != null){
+                            SharedPreferences sharedPreferences = v.getContext().getSharedPreferences("Request", Context.MODE_PRIVATE);
+                            SharedPreferences.Editor editor = sharedPreferences.edit();
+                            editor.putString("token",response.body().getToken());
+                            editor.apply();
+
                             Bundle bundle = new Bundle();
-                            bundle.putSerializable("User", (Serializable) user);
+                            bundle.putSerializable("User", user);
                             Toast.makeText(LoginActivity.this,"Login complete!", Toast.LENGTH_SHORT).show();
                             Intent intent = new Intent(LoginActivity.this, MainActivity.class);
                             intent.putExtras(bundle);
                             startActivity(intent);
+                            //Luư token đăng nhập protect
                             finish();
                         }
+
                     }else{
                         ResponseBody errorBody = response.errorBody();
                         try {
@@ -121,7 +126,7 @@ public class LoginActivity extends AppCompatActivity {
                 }
 
                 @Override
-                public void onFailure(Call<SignInMessage> call, Throwable t) {
+                public void onFailure(Call<AppMessage> call, Throwable t) {
                     dialog.dismiss();
                     Toast.makeText(LoginActivity.this, "Login Failed!", Toast.LENGTH_SHORT).show();
                 }
