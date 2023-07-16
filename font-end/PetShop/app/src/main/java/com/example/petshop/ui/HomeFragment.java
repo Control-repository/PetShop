@@ -5,7 +5,6 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -15,17 +14,17 @@ import androidx.lifecycle.ViewModelProvider;
 
 import com.example.petshop.R;
 import com.example.petshop.models.User;
-import com.example.petshop.viewmodel.UserViewModel;
+import com.example.petshop.viewmodel.AppViewModel;
 
 public class HomeFragment extends Fragment {
     public HomeFragment(){}
     User user;
-    UserViewModel userViewModel;
+    AppViewModel appViewModel;
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_home,container,false);
-        userViewModel = new ViewModelProvider(requireActivity()).get(UserViewModel.class);
-        userViewModel.getData().observe(getActivity(),item -> {
+        appViewModel = new ViewModelProvider(requireActivity()).get(AppViewModel.class);
+        appViewModel.getData().observe(getActivity(), item -> {
             user = item;
             Log.i("CHECK USER FRAGMENT",user.toString());
         });

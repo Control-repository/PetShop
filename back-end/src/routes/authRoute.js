@@ -1,7 +1,6 @@
 const route = require("express")();
 const auth = require("../controllers/authController.js");
 
-//kiểm tra tồn tại của user
 route.post("/signin", async (req, res) => {
   const { username, password } = req.body;
   try {
@@ -27,6 +26,7 @@ route.post("/signin", async (req, res) => {
         .json({ message: "Username or password is incorrect" });
     }
   } catch (error) {
+    console.log("LOGIN ERROR", error);
     res.status(500).json({ message: "Error server" });
   }
 });
@@ -34,5 +34,7 @@ route.post("/signin", async (req, res) => {
 //thêm mới user
 route.post("/register", auth.registerUser);
 //reset password
-route.put("reset-password", auth.resetPassword);
+route.put("/reset-password/:resetToken", auth.resetPassword);
+//forgot-password
+route.post("/forgot-password", auth.forgotPassword);
 module.exports = route;

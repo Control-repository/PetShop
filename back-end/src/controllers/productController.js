@@ -1,21 +1,24 @@
-const myConnection = require("../database/connect.db");
 const product = require("../models/product.model");
 
 //get All products
-const getAllProducts = (req, res) => {
-  let username = req.user.username;
+const getAllProducts = async (req, res) => {
+  let { username } = req.user;
   let search = req.query.search;
+  try {
 
-  product.getAll(username, search, (err, results) => {
-    if (err) {
-      return res.status(500).json({ message: "Failed to get product" });
+    const results = await product.getAll(username, search);
+    if (!results) {
+      return res.status(400).json({ message: "Failed to get product" });
     }
-    return res.json({ products: results });
-  });
+    return res.status(200).json({ products: results });
+  } catch (error) {
+    console.log("PRODUCT ERROR: ", error);
+    return res.status(500).json({ message: "Internal Server Error" });
+  }
 };
 
 //insert product
-const insertProduct = (req, res) => {
+const insertProduct = async (req, res) => {
   const { name, category, price, quantity, description, imageURL } = req.body;
   const { username } = req.user;
 
@@ -23,23 +26,25 @@ const insertProduct = (req, res) => {
     ...req.body,
     user_username: username,
   };
-
   if (!name || !category || !price || !quantity) {
     res.status(400).json({ message: "Missing required fields" });
     return;
   }
 
-  product.insert(values, (err, result) => {
-    if (err) {
-      console.log(err);
+  try {
+    const result = await product.insert(values);
+    if (!result) {
       return res.status(500).json({ message: "Failed to insert product" });
     }
-    res.status(200).json({ message: "Product inserted successfully" });
-  });
+
+    return res.status(200).json({ message: "Product inserted successfully" });
+  } catch (error) {
+    return res.status(500).json({ message: "Internal Server Error" });
+  }
 };
 
 //update information product
-const updateProduct = (req, res) => {
+const updateProduct = async (req, res) => {
   const { name, category, price, quantity, description, imageURL } = req.body;
   const { id } = req.params.id;
 
@@ -49,63 +54,56 @@ const updateProduct = (req, res) => {
     res.status(400).json({ message: "Missing required fields" });
     return;
   }
-
-  product.update(values, (err, result) => {
-    if (err) {
-      console.log("Failed to insert product", err);
-      return res.status(500).json({ message: "Failed to insert product" });
+  try {
+    const result = await product.update(values);
+    if (!result) {
+      return res.status(500).json({ message: "Failed to update product" });
     }
-    res.status(200).json({ message: "Product inserted successfully" });
-  });
+
+    return res.status(200).json({ message: "Product inserted successfully" });
+  } catch (error) {
+    return res.status(500).json({ message: "Internal Server Error" });
+  }
 };
 
 //get one product
-const getProduct = (req, res) => {
+const getProduct = async (req, res) => {
   const id = req.params.id;
-  product.getById(id, (err, results) => {
-    if (err) {
-      console.error("Error getting product:", err);
-      res.status(500).json({ message: "Error getting product" });
-      return;
-    }
-
-    if (!results) {
+  try {
+    const result = product.getById(id);
+    if (!result) {
       res.status(404).json({ message: "Product not found" });
-      return;
     }
-
-    return res.json(results);
-  });
+    return res.json({ product: result });
+  } catch (error) {
+    return res.status(500).json({ message: "Internal Server Error" });
+  }
 };
 // insert databse example
 const insertProducts = (req, res) => {
   myConnection.insertProducts(req, res);
 };
 //delete item by id
-const deleteProduct = (req, res) => {
+const deleteProduct = async (req, res) => {
   const { id } = req.params;
-  const { username } = req.user;
-  product.remove(username, id, (err, result) => {
-    if (err) {
-      return res.status(500).json({ message: "Error to delete Product" });
-    }
-
+  try {
+    await product.remove(id);
     return res.status(200).json({ message: "Delete successfully!" });
-  });
+  } catch (error) {
+    return res.status(500).json({ message: "Internal Server Error" });
+  }
 };
 //delete all product
-const deleteAllProduct = (req, res) => {
+const deleteAllProduct = async (req, res) => {
   const { username } = req.user;
-  product.removeAll(username, (err, result) => {
-    if (err) {
-      console.log("DELTE ALL", err);
-      return res.status(500).json({ message: "Failed to delete Products" });
-    }
-
+  try {
+    await product.removeAll(username);
     return res
       .status(200)
       .json({ message: "All products deleted successfully" });
-  });
+  } catch (error) {
+    return res.status(500).json({ message: "Internal Server Error" });
+  }
 };
 
 module.exports = {

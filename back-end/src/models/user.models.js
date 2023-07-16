@@ -1,29 +1,23 @@
 const { query } = require("../database/connect.db");
 
-const User = (user) => {
-  this.username = user.username;
-  this.password = user.password;
-  this.fullname = user.fullname;
-  this.email = user.email;
-  this.phone = user.phone;
-};
+const User = {};
 
-User.getAll = (callback) => {
+User.getAll = async () => {
   let questionQuery = `SELECT * from users`;
 
-  query(questionQuery, [], callback);
+  return await query(questionQuery, []);
 };
-User.getByUsername = (username, callback) => {
+User.getByUsername = async (username) => {
   let questionQuery = "SELECT * FROM users WHERE username =?";
-  query(questionQuery, [username], callback);
+  return await query(questionQuery, [username]);
 };
 
-User.getByEmail = (email, callback) => {
+User.getByEmail = async (email) => {
   let questionQuery = "SELECT * FROM users WHERE email =?";
-  query(questionQuery, [email], callback);
+  return await query(questionQuery, [email]);
 };
 
-User.insert = (data, callback) => {
+User.insert = async (data) => {
   let questionQuery =
     "INSERT INTO users(username,password,fullname,email,phone) VALUES(?,?,?,?,?)";
   const values = [
@@ -33,22 +27,22 @@ User.insert = (data, callback) => {
     data.email,
     data.phone,
   ];
-  query(questionQuery, values, callback);
+  return await query(questionQuery, values);
 };
 
-User.updatePassword = (username, newPassword, callback) => {
+User.updatePassword = async (username, newPassword) => {
   let questionQuery = "UPDATE users SET password=? WHERE username=?";
-  query(questionQuery, [data.password, data.username], callback);
+  return await query(questionQuery, [newPassword, username]);
 };
 
-User.update = (data, callback) => {
+User.update = async (data) => {
   let questionQuery =
     "UPDATE users SET email=?,phone=?,fullname=? WHERE username=?";
-  query(questionQuery, [data.email, data.phone, data.fullname], callback);
+  return await query(questionQuery, [data.email, data.phone, data.fullname]);
 };
 
-User.remove = (id, callback) => {
+User.remove = async (id) => {
   let questionQuery = "DELETE FROM users WHERE id =?";
-  query(questionQuery, [id], callback);
+  return await query(questionQuery, [id]);
 };
 module.exports = User;

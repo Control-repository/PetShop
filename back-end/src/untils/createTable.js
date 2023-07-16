@@ -19,14 +19,15 @@ const userTable = `
   )
 `;
 const reset_pass_table = `
-  CREATE TABLE IF NOT EXISTS reset_password_token(
-    id INT PRIMARY KEY AUTO_INCREMENT,
-    user_username VARCHAR(50) NOT NULL,
-    token VARCHAR(255) NOT NULL,
-    create_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    expiresAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (user_username) REFERENCES users(username) 
-  )`;
+CREATE TABLE IF NOT EXISTS reset_password_token(
+  id INT PRIMARY KEY AUTO_INCREMENT,
+  user_username VARCHAR(50) NOT NULL,
+  token VARCHAR(255) NOT NULL,
+  create_at DATE DEFAULT CURRENT_TIMESTAMP,
+  expiresAt DATE DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (user_username) REFERENCES users(username) 
+);
+`;
 
 module.exports = {
   productTable,

@@ -12,7 +12,7 @@ import com.example.petshop.ui.HomeFragment;
 import com.example.petshop.ui.PasswordFragment;
 import com.example.petshop.ui.ProductFragment;
 import com.example.petshop.ui.UserFragment;
-import com.example.petshop.viewmodel.UserViewModel;
+import com.example.petshop.viewmodel.AppViewModel;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.navigation.NavigationView;
 
@@ -32,7 +32,7 @@ import java.util.Objects;
 public class MainActivity extends AppCompatActivity {
 
     private AppBarConfiguration mAppBarConfiguration;
-    UserViewModel userViewModel;
+    AppViewModel userViewModel;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -41,20 +41,14 @@ public class MainActivity extends AppCompatActivity {
         setContentView(binding.getRoot());
 
         setSupportActionBar(binding.appBarMain.toolbar);
-        binding.appBarMain.fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });
+
         DrawerLayout drawer = binding.drawerLayout;
         NavigationView navigationView = binding.navView;
         // Passing each menu ID as a set of Ids because each
         // menu should be considered as top level destinations.
         //get User when login successfully
         Intent intent = getIntent();
-        userViewModel = new ViewModelProvider(this).get(UserViewModel.class);
+        userViewModel = new ViewModelProvider(this).get(AppViewModel.class);
         if(intent !=null) {
             Bundle bundle = intent.getExtras();
             User user =(User) bundle.getSerializable("User");
@@ -62,7 +56,6 @@ public class MainActivity extends AppCompatActivity {
                 userViewModel.setData(user);
             }
         }
-
 
         mAppBarConfiguration = new AppBarConfiguration.Builder(
                 R.id.nav_home, R.id.nav_product, R.id.nav_customer, R.id.nav_password, R.id.nav_user,R.id.nav_logout,R.id.nav_exit
@@ -89,6 +82,15 @@ public class MainActivity extends AppCompatActivity {
                 return handled;
             }
         });
+
+        navController.addOnDestinationChangedListener((controller, destination, arguments) -> {
+            // Kiểm tra xem Fragment hiện tại có phải là ProductFragment hoặc CustomerFragment hay không
+            boolean isProductFragment = destination.getId() == R.id.nav_product;
+            boolean isCustomerFragment = destination.getId() == R.id.nav_customer;
+            // Hiển thị hoặc ẩn FAB tùy theo kết quả kiểm tra
+            binding.appBarMain.fab.setVisibility(isProductFragment || isCustomerFragment ? View.VISIBLE : View.GONE);
+        });
+
         NavigationUI.setupActionBarWithNavController(this, navController, mAppBarConfiguration);
     }
 

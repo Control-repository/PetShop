@@ -71,13 +71,15 @@ connection.connect((err) => {
   });
 });
 
-const query = (sql, value, callback) => {
-  connection.query(sql, value, (err, results) => {
-    if (err) {
-      callback(err, null);
-      return;
-    }
-    callback(null, results);
+const query = (sql, value) => {
+  return new Promise((resolve, reject) => {
+    connection.query(sql, value, (err, results) => {
+      if (err) {
+        reject(err);
+        return;
+      }
+      resolve(results);
+    });
   });
 };
 

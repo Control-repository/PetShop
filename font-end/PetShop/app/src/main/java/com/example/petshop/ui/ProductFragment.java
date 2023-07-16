@@ -1,24 +1,17 @@
 package com.example.petshop.ui;
 
-import android.annotation.SuppressLint;
-import android.app.SearchManager;
-import android.content.Context;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SearchView;
-import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.GridLayoutManager;
@@ -32,27 +25,22 @@ import com.example.petshop.models.Product;
 import com.example.petshop.models.User;
 import com.example.petshop.untils.ApiService;
 import com.example.petshop.untils.RetroClient;
-import com.example.petshop.viewmodel.UserViewModel;
-import com.google.gson.Gson;
+import com.example.petshop.viewmodel.AppViewModel;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
 
 public class ProductFragment extends Fragment {
-    private User user;
-    private UserViewModel userViewModel;
-    public ProductFragment(){}
-    private RecyclerView recycler_product;
-
-    private String searchQuery;
+    private AppViewModel appViewModel;
+    private RecyclerView recyclerProduct;
     private ProductAdapter productAdapter;
-    private Context context;
+    private String searchQuery;
+    private boolean isFirstLoad = true;
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         setHasOptionsMenu(true);
@@ -61,53 +49,32 @@ public class ProductFragment extends Fragment {
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
-        context = requireContext();
         View view =inflater.inflate(R.layout.fragment_product,container,false);
-        //
+        // Lắng nghe sự thay đổi của LiveData để nhận thông tin User
+        appViewModel = new ViewModelProvider(requireActivity()).get(AppViewModel.class);
+        // Khởi tạo các view và adapter
+        productAdapter = new ProductAdapter(new ArrayList<>());
+        loadProductList();
 
-        //get value of user
-        userViewModel = new ViewModelProvider(requireActivity()).get(UserViewModel.class);
-        userViewModel.getData().observe(getActivity(),item -> {
-            user = item;
-            Log.i("CHECK USER FRAGMENT",user.toString());
-        });
+
+
+
         return view;
     }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        recycler_product = view.findViewById(R.id.recycler_product);
-        recycler_product.setLayoutManager(new GridLayoutManager(getContext(),2));
-        if(user!=null){
-            RetroClient.setContext(requireContext());
-            ApiService apiService = RetroClient.getApiService();
-            Call<AppMessage> call =apiService.getAllProduct(searchQuery);
-            call.enqueue(new Callback<AppMessage>() {
-                @Override
-                public void onResponse(Call<AppMessage> call, Response<AppMessage> response) {
-                    Gson gson = new Gson();
-                    if(response.isSuccessful()){
-                        AppMessage body = response.body();
-                        List<Product> listProduct = body.getProductList();
+        recyclerProduct = view.findViewById(R.id.recycler_product);
+        recyclerProduct.setLayoutManager(new GridLayoutManager(getContext(), 2));
 
-                        reloadAdapter(listProduct);
-
-                        Toast.makeText(context, "Download List Product successfully!", Toast.LENGTH_SHORT).show();
-                    }
-                        ResponseBody errorBody = response.errorBody();
-                        if(errorBody!=null){
-                            AppMessage appMessage = gson.fromJson(errorBody.toString(),AppMessage.class);
-                            Toast.makeText(context,appMessage.getMessage(),Toast.LENGTH_SHORT).show();
-                        }
-                }
-
-                @Override
-                public void onFailure(Call<AppMessage> call, Throwable t) {
-                    Toast.makeText(context, "Something wrong!", Toast.LENGTH_SHORT).show();
-                }
-            });
-        }
+        appViewModel.getListProduct().observe(getViewLifecycleOwner(), list -> {
+            if(isLoadList()){
+                productAdapter.setProductList(list);
+                recyclerProduct.setAdapter(productAdapter);
+                isFirstLoad = false;
+            }
+        });
     }
 
     @Override
@@ -127,12 +94,14 @@ public class ProductFragment extends Fragment {
             @Override
             public boolean onQueryTextChange(String newText) {
                 searchQuery = newText;
+                if(newText!=null || isLoadList()){
+                    loadProductList();
+                }
                 return false;
             }
         });
         // Set the text hint
         searchView.setQueryHint("Tên sản phẩm cần tìm");
-
     }
 
     @Override
@@ -145,10 +114,30 @@ public class ProductFragment extends Fragment {
         super.onDestroyView();
     }
 
-    private void reloadAdapter(List<Product> list){
-        productAdapter = new ProductAdapter(list);
-        recycler_product.setLayoutManager(new GridLayoutManager(context,2));
-        recycler_product.setAdapter(productAdapter);
 
+    private boolean isLoadList(){
+        return (searchQuery !=null || isFirstLoad);
+    }
+    private void loadProductList(){
+            RetroClient.setContext(requireContext());
+            ApiService apiService = RetroClient.getApiService();
+            Call<AppMessage> call =apiService.getAllProduct(searchQuery);
+            call.enqueue(new Callback<AppMessage>() {
+                @Override
+                public void onResponse(Call<AppMessage> call, Response<AppMessage> response) {
+                    if (response.isSuccessful()) {
+                        AppMessage body = response.body();
+                        List<Product> productList = body.getProductList();
+                        appViewModel.setListProduct(productList);
+                    } else {
+                        Toast.makeText(requireContext(), "Failed to get product", Toast.LENGTH_SHORT).show();
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<AppMessage> call, Throwable t) {
+                    Toast.makeText(requireContext(), "Something wrong!", Toast.LENGTH_SHORT).show();
+                }
+            });
     }
 }

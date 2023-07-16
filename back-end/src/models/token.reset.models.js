@@ -1,39 +1,32 @@
 const { query } = require("../database/connect.db");
 
-const Token = (token) => {
-  this.id = token.id;
-  this.user_username = token.user_username;
-  this.token = token.token;
-  this.create_at = token.create_at;
-};
+const Token = {};
 
 //get Token
-Token.getToken = (username, callback) => {
+Token.getToken = async (username) => {
   let questionQuery = `SELECT * from reset_password_token WHERE user_username = ?`;
 
-  query(questionQuery, [username], callback);
+  return await query(questionQuery, [username]);
 };
 //get Token
-Token.getToken = (token, expiresAt, callback) => {
-  let questionQuery = `SELECT * from reset_password_token WHERE token = ? AND expriseAt =?`;
+Token.getToken = async (token, expiresAt) => {
+  let questionQuery = `SELECT * from reset_password_token WHERE token = ? AND expiresAt >=?`;
 
-  query(questionQuery, [token, expiresAt], callback);
+  return await query(questionQuery, [token, expiresAt]);
 };
 
 //insert
-Token.insert = (username, token, callback) => {
+Token.insert = async (username, token) => {
+  const create_at = new Date();
+  const expiresAt = new Date(create_at.getTime() + 30 * (60 * 1000));
   let questionQuery = `INSERT INTO reset_password_token(user_username,token,create_at,expiresAt) VALUES(?,?,?,?)`;
-  query(
-    questionQuery,
-    [username, token, Date.now(), Date.now() + 30 * (60 * 1000)],
-    callback
-  );
+  return await query(questionQuery, [username, token, create_at, expiresAt]);
 };
 
 //delete token
-Token.delete = (username, callback) => {
+Token.delete = async (username) => {
   const questionQuery = `DELETE FROM reset_password_token WHERE user_username = ?`;
-  query(questionQuery, [username], callback);
+  return await query(questionQuery, [username]);
 };
 
 module.exports = Token;

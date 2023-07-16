@@ -10,12 +10,14 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.Checkable;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.petshop.models.AppMessage;
 import com.example.petshop.models.User;
 import com.example.petshop.untils.ApiService;
+import com.example.petshop.untils.CheckInput;
 import com.example.petshop.untils.RetroClient;
 import com.google.android.material.textfield.TextInputLayout;
 import com.google.gson.Gson;
@@ -47,7 +49,7 @@ public class LoginActivity extends AppCompatActivity {
         btn_SignIn.setOnClickListener(this::clickSignIn);
 
         tv_miss_password.setOnClickListener(v->{
-            startActivity(new Intent(LoginActivity.this,ResetPassActivity.class));
+            startActivity(new Intent(LoginActivity.this,ForgotPasswordActivity.class));
             finish();
         });
         tv_register.setOnClickListener(v->{
@@ -63,20 +65,7 @@ public class LoginActivity extends AppCompatActivity {
         String username = ip_username.getEditText().getText().toString().trim();
         String password = ip_password.getEditText().getText().toString().trim();
 
-        //Kiểm tra để trống của 2 input
-        if(username.isEmpty()){
-            ip_username.setError("Please enter your username");
-        }else{
-            ip_username.setError(null);
-        }
-
-        if(password.isEmpty()){
-            ip_password.setError("Please enter your password");
-        }else{
-            ip_password.setError(null);
-        }
-
-        if(!username.isEmpty()&& !password.isEmpty()){
+        if(CheckInput.validateInput(username,ip_username)&& CheckInput.validateInput(password,ip_password)){
             dialog.setMessage("Loading...");
             dialog.show();
             //truyền context
