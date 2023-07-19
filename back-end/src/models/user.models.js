@@ -29,13 +29,14 @@ User.getByEmail = async (email) => {
 
 User.insert = async (data) => {
   let questionQuery =
-    "INSERT INTO users(username,password,fullname,email,phone) VALUES(?,?,?,?,?)";
+    "INSERT INTO users(username,password,fullname,email,phone,role) VALUES(?,?,?,?,?,?)";
   const values = [
     data.username,
     data.password,
     data.fullname,
     data.email,
     data.phone,
+    data.role,
   ];
   return await query(questionQuery, values);
 };
@@ -48,7 +49,23 @@ User.updatePassword = async (username, newPassword) => {
 User.update = async (data) => {
   let questionQuery =
     "UPDATE users SET email=?,phone=?,fullname=? WHERE username=?";
-  return await query(questionQuery, [data.email, data.phone, data.fullname]);
+  return await query(questionQuery, [
+    data.email,
+    data.phone,
+    data.fullname,
+    data.username,
+  ]);
+};
+User.updateAll = async (data) => {
+  let questionQuery =
+    "UPDATE users SET email=?,phone=?,fullname=?,password=? WHERE username=?";
+  return await query(questionQuery, [
+    data.email,
+    data.phone,
+    data.fullname,
+    data.password,
+    data.username,
+  ]);
 };
 
 User.remove = async (username) => {

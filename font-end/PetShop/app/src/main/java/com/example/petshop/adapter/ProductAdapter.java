@@ -11,7 +11,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.petshop.R;
 import com.example.petshop.models.Product;
-import com.example.petshop.untils.DecimalValue;
+import com.example.petshop.utils.DecimalValue;
 import com.squareup.picasso.Picasso;
 
 import java.util.List;

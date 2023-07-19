@@ -13,7 +13,7 @@ const generateToken = (id) => {
 
 //thêm mới một user
 const registerUser = async (req, res) => {
-  const { username, password, fullname, email, phone } = req.body;
+  const { username, password, fullname, email, phone,role } = req.body;
 
   if (!username || !password || !email) {
     return res.status(400).json({ message: "Missing required fields" });
@@ -78,14 +78,37 @@ const logout = (req, res) => {
   });
   return res.status(200).json({ message: "Successfully Logged Out!" });
 };
-
-//update User
-const updateInfor = async (req, res) => {
+//update all information for user
+const updateAll = async (req, res) => {
+  const { username } = req.params;
   try {
-    await userModel.update(req.body);
-
+    const values = { username, ...req.body };
+    await userModel.updateAll(values);
     return res.status(200).json({ message: "User change successfully!" });
   } catch (error) {
+    console.log("ERROR UPDATE ALL USER: ", error);
+    return res
+      .status(500)
+      .json({ message: "Error to change user information!" });
+  }
+};
+//update User
+const updateInfor = async (req, res) => {
+  const { username } = req.user;
+
+  const values = { username, ...req.body };
+  try {
+    const result = await userModel.getByUsername(username);
+    if (result.length !== 0) {
+      const user = await userModel.update(values);
+      return res
+        .status(200)
+        .json({ message: "User change successfully!", user: user[0] });
+    } else {
+      return res.status(400).json({ message: "Not to found User!" });
+    }
+  } catch (error) {
+    console.log("ERROR UPDATE USER: ", error);
     return res
       .status(500)
       .json({ message: "Error to change user information!" });
@@ -97,9 +120,7 @@ const updatePassword = async (req, res) => {
   const { password } = req.body;
   const { username } = req.user;
   try {
-    if (req.user) {
-      await userModel.updatePassword(username, password);
-    }
+    await userModel.updatePassword(username, password);
     return res.status(200).json({ message: "Change password successfully!" });
   } catch (error) {
     return res.status(500).json({ message: "Error to change Password " });
@@ -228,6 +249,7 @@ module.exports = {
   forgotPassword,
   updateInfor,
   updatePassword,
+  updateAll,
   deleteUser,
   getAllCurrent,
   getAll,

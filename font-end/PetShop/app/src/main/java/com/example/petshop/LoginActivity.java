@@ -11,15 +11,14 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
-import android.widget.Checkable;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.petshop.models.AppMessage;
 import com.example.petshop.models.User;
-import com.example.petshop.untils.ApiService;
-import com.example.petshop.untils.CheckInput;
-import com.example.petshop.untils.RetroClient;
+import com.example.petshop.utils.ApiService;
+import com.example.petshop.utils.CheckInput;
+import com.example.petshop.utils.RetroClient;
 import com.example.petshop.viewmodel.UserViewModel;
 import com.google.android.material.textfield.TextInputLayout;
 import com.google.gson.Gson;
@@ -35,14 +34,11 @@ public class LoginActivity extends AppCompatActivity {
     private TextInputLayout ip_username,ip_password;
     private Button btn_SignIn;
     private TextView tv_miss_password,tv_register;
-
-    private UserViewModel userViewModel;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
-        //userviewmodel
-        userViewModel = new ViewModelProvider(this).get(UserViewModel.class);
+
         //mapping
         ip_password = findViewById(R.id.ip_password);
         ip_username = findViewById(R.id.ip_username);
@@ -94,10 +90,13 @@ public class LoginActivity extends AppCompatActivity {
                             editor.putString("token",response.body().getToken());
                             editor.apply();
                             //Lưu user vào viewmodel để sử dụng trong ứng dụng
-                            userViewModel.setUserData(user);
+                            Bundle bundle =new Bundle();
+                            bundle.putSerializable("User",user);
+                            Log.i("LOGIN USER ",user.toString());
                             //Thông báo đăng nhập thành công và chuyển sang màn hình chính
                             Toast.makeText(LoginActivity.this,"Login complete!", Toast.LENGTH_SHORT).show();
                             Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+                            intent.putExtras(bundle);
                             startActivity(intent);
                             finish();
                         }

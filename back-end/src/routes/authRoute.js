@@ -43,8 +43,10 @@ route.put("/reset-password/:resetToken", auth.resetPassword);
 route.post("/forgot-password", auth.forgotPassword);
 //update information user
 route.put("/update/infor", protect, auth.updateInfor);
-//update password
+//update password for current user
 route.put("/update/password", protect, auth.updatePassword);
+//update all innformation
+route.put("/udpate/all/:username", protect, auth.updateAll);
 //delete user
 route.delete("/delete/user/:username", protect, auth.deleteUser);
 module.exports = route;

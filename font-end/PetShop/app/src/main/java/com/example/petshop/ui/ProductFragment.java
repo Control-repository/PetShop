@@ -26,10 +26,9 @@ import com.example.petshop.R;
 import com.example.petshop.adapter.ProductAdapter;
 import com.example.petshop.models.AppMessage;
 import com.example.petshop.models.Product;
-import com.example.petshop.untils.ApiService;
-import com.example.petshop.untils.RetroClient;
+import com.example.petshop.utils.ApiService;
+import com.example.petshop.utils.RetroClient;
 import com.example.petshop.viewmodel.ProductViewModel;
-import com.example.petshop.viewmodel.UserViewModel;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.util.ArrayList;

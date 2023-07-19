@@ -4,12 +4,12 @@
     xmlns:android="http://schemas.android.com/apk/res/android">
     <item
         android:id="@+id/menu_edit"
-        android:title="Edit profile"
+        android:title="Open"
         android:icon="@drawable/baseline_edit_note_24"
-        app:showAsAction="always" />
+        app:showAsAction="ifRoom|withText" />
     <item
         android:id="@+id/menu_delete"
         android:title="Delete User"
         android:icon="@drawable/baseline_delete_24"
-        app:showAsAction="always" />
+        app:showAsAction="withText" />
 </menu>

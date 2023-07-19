@@ -1,13 +1,16 @@
 package com.example.petshop.ui;
 
 import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
 
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -15,19 +18,31 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.Toast;
 
 import com.example.petshop.R;
+import com.example.petshop.models.AppMessage;
 import com.example.petshop.models.User;
+import com.example.petshop.utils.ApiService;
+import com.example.petshop.utils.RetroClient;
 import com.example.petshop.viewmodel.UserViewModel;
 import com.google.android.material.textfield.TextInputLayout;
+import com.google.gson.Gson;
+
+import okhttp3.ResponseBody;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class UserFragment extends Fragment {
-    User user;
+    User thisUser;
     private UserViewModel userViewModel;
     public UserFragment(){
     }
-    private boolean isOpen =false;
+    private static boolean isOpen =false;
     private TextInputLayout ip_fullname,ip_email,ip_phone;
+    private Button btn_change;
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         setHasOptionsMenu(true);
@@ -41,17 +56,31 @@ public class UserFragment extends Fragment {
         ip_fullname = view.findViewById(R.id.ip_name_user);
         ip_email = view.findViewById(R.id.ip_email_user);
         ip_phone = view.findViewById(R.id.ip_phone_user);
+        btn_change = view.findViewById(R.id.btn_change);
+
         return view;
     }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        userViewModel = new ViewModelProvider(requireActivity()).get(UserViewModel.class);
+        userViewModel.getUserData().observe(getViewLifecycleOwner(),user->{
+            if(user!=null){
+                thisUser = user;
+                ip_fullname.getEditText().setText(user.getFullName());
+                ip_phone.getEditText().setText(user.getPhone());
+                ip_email.getEditText().setText(user.getEmail());
+            }
 
-        ip_fullname.setEnabled(isOpen);
-        ip_email.setEnabled(isOpen);
-        ip_phone.setEnabled(isOpen);
+        });
 
+        btn_change.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                sendToChangeInformationUser();
+            }
+        });
     }
 
     public void onDestroyView() {
@@ -62,6 +91,7 @@ public class UserFragment extends Fragment {
         inflater.inflate(R.menu.menu_user, menu);
         super.onCreateOptionsMenu(menu, inflater);
 
+
     }
 
 
@@ -69,7 +99,7 @@ public class UserFragment extends Fragment {
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         int id = item.getItemId();
         if(id == R.id.menu_edit){
-            changeCheck();
+            changeEnable();
         }
         if(id == R.id.menu_delete){
             AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
@@ -91,10 +121,84 @@ public class UserFragment extends Fragment {
             dialog.show();
         }
                 return super.onOptionsItemSelected(item);
+    }
+
+    private void changeEnable() {
+        boolean isEnable = ip_fullname.isEnabled();
+        ip_fullname.setEnabled(!isEnable);
+        ip_email.setEnabled(!isEnable);
+        ip_phone.setEnabled(!isEnable);
+        btn_change.setVisibility(isEnable ?View.GONE:View.VISIBLE);
+    }
+
+    private void sendToChangeInformationUser() {
+        ProgressDialog dialog = new ProgressDialog(requireContext());
+        dialog.setMessage("Loading...");
+        String fullname = ip_fullname.getEditText().getText().toString();
+        String phone = ip_phone.getEditText().getText().toString();
+        String email = ip_email.getEditText().getText().toString();
+
+        if(validateInput()){
+            RetroClient.setContext(requireContext());
+            ApiService apiService = RetroClient.getApiService();
+
+            User userChange = new User();
+            userChange.setFullName(fullname);
+            userChange.setPhone(phone);
+            userChange.setEmail(email);
+            Call<AppMessage> call = apiService.setUserInformation(userChange);
+            call.enqueue(new Callback<AppMessage>() {
+                @Override
+                public void onResponse(Call<AppMessage> call, Response<AppMessage> response) {
+                    dialog.dismiss();
+                    if(response.isSuccessful()){
+                        userViewModel.setUserData(response.body().getUser());
+                        Toast.makeText(requireContext(), response.body().getMessage(), Toast.LENGTH_SHORT).show();
+                        changeEnable();
+                    }else{
+                        ResponseBody errorBody = response.errorBody();
+                        if(errorBody!=null){
+                            try {
+                                AppMessage appMessage = new Gson().fromJson(errorBody.string(), AppMessage.class);
+                                Toast.makeText(requireContext(), appMessage.getMessage(), Toast.LENGTH_SHORT).show();
+                            }catch (Exception e){
+                                e.printStackTrace();
+                            }
+                        }
+
+
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<AppMessage> call, Throwable t) {
+
+                }
+            });
+        }
 
     }
 
-    private boolean changeCheck(){
-        return !isOpen;
+    private boolean validateInput(){
+        String fullname = ip_fullname.getEditText().getText().toString();
+        String phone = ip_phone.getEditText().getText().toString();
+        String email = ip_email.getEditText().getText().toString();
+
+        if(TextUtils.isEmpty(fullname)){
+            ip_fullname.setError("Vui lòng không để trống tên");
+            return false;
+        }
+        if(TextUtils.isEmpty(phone)){
+            ip_phone.setError("Vui lòng không để trống số điện thoại");
+            return false;
+        }
+        if(TextUtils.isEmpty(email)){
+            ip_email.setError("Vui lòng không để trống email");
+            return false;
+        }
+        ip_fullname.setError(null);
+        ip_phone.setError(null);
+        ip_email.setError(null);
+        return true;
     }
 }

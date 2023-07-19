@@ -46,12 +46,17 @@ public class MainActivity extends AppCompatActivity {
         fullname = headerView.findViewById(R.id.user_fullname);
         username = headerView.findViewById(R.id.user_username);
 
-        userViewModel.getUserData().observe(this,user -> {
-            if(user!=null){
-                fullname.setText(user.getFullName());
-                username.setText(user.getUsername());
-            }
-        });
+        Intent intent =getIntent();
+        if(intent!=null){
+            Bundle bundle = intent.getExtras();
+            User user =(User) bundle.getSerializable("User");
+            userViewModel.setUserData(user);
+            fullname.setText(user.getFullName());
+            username.setText(user.getUsername());
+        }
+
+
+
 
         mAppBarConfiguration = new AppBarConfiguration.Builder(
                 R.id.nav_home, R.id.nav_product, R.id.nav_customer, R.id.nav_password, R.id.nav_user,

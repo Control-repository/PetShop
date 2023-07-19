@@ -3,12 +3,14 @@ package com.example.petshop.adapter;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.petshop.R;
+import com.example.petshop.interfaces.ItemClickListener;
 import com.example.petshop.models.User;
 
 import java.util.ArrayList;
@@ -24,6 +26,11 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder>{
     public void setList(List<User> list) {
         this.list = list;
     }
+    private ItemClickListener onItemClickListener;
+
+    public void setOnItemClickListener(ItemClickListener onItemClickListener) {
+        this.onItemClickListener = onItemClickListener;
+    }
 
     @NonNull
     @Override
@@ -38,7 +45,12 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder>{
         if(user!=null){
             holder.tv_fullname.setText(user.getFullName());
             holder.tv_phone.setText(user.getPhone());
-            holder.tv_role.setText(user.getRole());
+            if(user.getRole() == 0) {
+                holder.tv_role.setText("Admin");
+            } else{
+                holder.tv_role.setText("User");
+            }
+
         }
     }
 
@@ -54,6 +66,17 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder>{
             tv_fullname = itemView.findViewById(R.id.tv_fullname_user);
             tv_phone = itemView.findViewById(R.id.tv_phone_user);
             tv_role = itemView.findViewById(R.id.tv_role_user);
+
+            itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    int position = getAdapterPosition();
+                    if (position != RecyclerView.NO_POSITION && onItemClickListener != null) {
+                        User item = list.get(position);
+                        onItemClickListener.onItemUserClick(item);
+                    }
+                }
+            });
         }
     }
 }

@@ -76,12 +76,8 @@ public class User implements Serializable {
         this.phone = phone;
     }
 
-    public String getRole() {
-        String nameRole = "Admin";
-        if(role == 1){
-            nameRole ="User";
-        }
-        return nameRole;
+    public int getRole() {
+        return role;
     }
 
     public void setRole(int role) {

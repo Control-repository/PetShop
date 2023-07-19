@@ -1,30 +1,22 @@
 package com.example.petshop;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.petshop.models.AppMessage;
-import com.example.petshop.models.ResetPasswordRequest;
-import com.example.petshop.untils.ApiService;
-import com.example.petshop.untils.CheckInput;
-import com.example.petshop.untils.RetroClient;
+import com.example.petshop.utils.ApiService;
+import com.example.petshop.utils.CheckInput;
+import com.example.petshop.utils.RetroClient;
 import com.google.android.material.textfield.TextInputLayout;
 import com.google.gson.Gson;
-
-import java.io.IOException;
-import java.util.Objects;
 
 import okhttp3.ResponseBody;
 import retrofit2.Call;

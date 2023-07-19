@@ -1,4 +1,4 @@
-package com.example.petshop.untils;
+package com.example.petshop.utils;
 
 
 import java.text.DecimalFormat;
