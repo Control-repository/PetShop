@@ -14,20 +14,14 @@ import androidx.lifecycle.ViewModelProvider;
 
 import com.example.petshop.R;
 import com.example.petshop.models.User;
-import com.example.petshop.viewmodel.AppViewModel;
+import com.example.petshop.viewmodel.UserViewModel;
 
 public class HomeFragment extends Fragment {
     public HomeFragment(){}
-    User user;
-    AppViewModel appViewModel;
+
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_home,container,false);
-        appViewModel = new ViewModelProvider(requireActivity()).get(AppViewModel.class);
-        appViewModel.getData().observe(getActivity(), item -> {
-            user = item;
-            Log.i("CHECK USER FRAGMENT",user.toString());
-        });
         return view;
     }
 

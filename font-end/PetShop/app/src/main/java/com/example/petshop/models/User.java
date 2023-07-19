@@ -22,6 +22,9 @@ public class User implements Serializable {
     @Expose
     String phone;
 
+    @SerializedName("role")
+    int role;
+
     public User() {
     }
 
@@ -73,6 +76,18 @@ public class User implements Serializable {
         this.phone = phone;
     }
 
+    public String getRole() {
+        String nameRole = "Admin";
+        if(role == 1){
+            nameRole ="User";
+        }
+        return nameRole;
+    }
+
+    public void setRole(int role) {
+        this.role = role;
+    }
+
     @Override
     public String toString() {
         return "User{" +
@@ -81,6 +96,7 @@ public class User implements Serializable {
                 ", email='" + email + '\'' +
                 ", fullName='" + fullName + '\'' +
                 ", phone='" + phone + '\'' +
+                ", role='" + role + '\'' +
                 '}';
     }
 }

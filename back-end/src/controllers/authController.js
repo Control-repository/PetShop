@@ -1,5 +1,6 @@
 const jwt = require("jsonwebtoken");
-const user = require("../models/user.models");
+const userModel = require("../models/user.models");
+const Product = require("../models/product.model");
 const token = require("../models/token.reset.models");
 const { query } = require("../database/connect.db");
 
@@ -11,50 +12,42 @@ const generateToken = (id) => {
 };
 
 //thêm mới một user
-const registerUser = (req, res) => {
+const registerUser = async (req, res) => {
   const { username, password, fullname, email, phone } = req.body;
 
-  if (!username || !password) {
+  if (!username || !password || !email) {
     return res.status(400).json({ message: "Missing required fields" });
   }
 
-  user.getByUsername(username, (err, results) => {
-    if (err) {
-      return res.status(500).json({ message: "Error checking username" });
+  try {
+    await userModel.getByUsername(username);
+
+    const isCheck = await userModel.getByEmail(email);
+    if (isCheck.length > 0) {
+      return res.status(400).json({ message: "Email already exists" });
     }
-
-    if (results.length > 0) {
-      return res.status(409).json({ message: "username already exists" });
-    }
-
-    user.getByEmail(email, (err, result) => {
-      if (err) {
-        return res.status(500).json({ message: "Error register user" });
-      }
-      if (result.length !== 0) {
-        return res.status(409).json({ message: "Email already exists" });
-      }
-
-      const token = generateToken(username);
-      // Send HTTP-only cookie
-      res.cookie("token", token, {
-        path: "/",
-        httpOnly: true,
-        expires: new Date(Date.now() + 1000 * 86400), // 1 day
-        sameSite: "none",
-        // secure: true,
-      });
-
-      user.insert(req.body, (err, result) => {
-        if (err) {
-          return res.status(500).json({ message: "Failed register user" });
-        }
-        res.status(200).json({
-          message: "User inserted successfully",
-        });
-      });
+    const token = generateToken(username);
+    // Send HTTP-only cookie
+    res.cookie("token", token, {
+      path: "/",
+      httpOnly: true,
+      expires: new Date(Date.now() + 1000 * 86400), // 1 day
+      sameSite: "none",
+      // secure: true,
     });
-  });
+
+    await userModel.insert(req.body);
+    res.status(200).json({
+      message: "User inserted successfully",
+    });
+  } catch (error) {
+    console.log("REGISTER USER FAULT", error);
+    if (error.code === "ER_DUP_ENTRY") {
+      return res.status(409).json({ message: "Username already exits" });
+    } else {
+      return res.status(500).json({ message: "Failed register user" });
+    }
+  }
 };
 
 const loginUser = async (username, password) => {
@@ -87,27 +80,52 @@ const logout = (req, res) => {
 };
 
 //update User
-const updateUser = (req, res) => {
-  const { fullname, email, phone } = req.body;
-
-  if (!fullname || !email || !phone) {
-    return res.status(400).json({ message: "Missing required fields" });
-  }
-  user.update(req.body, (err, result) => {
-    if (err) {
-      return res
-        .status(500)
-        .json({ message: "Error to change user information!" });
-    }
+const updateInfor = async (req, res) => {
+  try {
+    await userModel.update(req.body);
 
     return res.status(200).json({ message: "User change successfully!" });
-  });
+  } catch (error) {
+    return res
+      .status(500)
+      .json({ message: "Error to change user information!" });
+  }
 };
+
+//update password
+const updatePassword = async (req, res) => {
+  const { password } = req.body;
+  const { username } = req.user;
+  try {
+    if (req.user) {
+      await userModel.updatePassword(username, password);
+    }
+    return res.status(200).json({ message: "Change password successfully!" });
+  } catch (error) {
+    return res.status(500).json({ message: "Error to change Password " });
+  }
+};
+//delete user
+const deleteUser = async (req, res) => {
+  const { username } = req.params;
+  try {
+    const result = userModel.getByUsername(username);
+    if (!result) {
+      return res.status(400).json({ message: "Not found username" });
+    }
+    await userModel.remove(username);
+    await Product.removeAll(username);
+    return res.status(200).json({ message: "Remove succesfully!" });
+  } catch (error) {
+    return res.status(500).json({ message: "Error to delete user" });
+  }
+};
+
 //forgot password
 const forgotPassword = async (req, res) => {
   const { email } = req.body;
   try {
-    const result = await user.getByEmail(email);
+    const result = await userModel.getByEmail(email);
     if (result.length === 0) {
       return res.status(500).json({ message: "Not found email" });
     }
@@ -128,7 +146,7 @@ const forgotPassword = async (req, res) => {
     await token.insert(result[0].username, hashedToken);
 
     const subject = "Password Reset Request";
-    const send_to = user.email;
+    const send_to = email;
     const sent_from = process.env.EMAIL_USER;
 
     const message = `
@@ -165,7 +183,7 @@ const resetPassword = async (req, res) => {
     }
     const { user_username } = tokens[0];
     // Update password
-    const isUpdate = await user.updatePassword(user_username, password);
+    const isUpdate = await userModel.updatePassword(user_username, password);
     if (isUpdate.length === 0) {
       return res.status(400).json({ message: "Wrong to update password" });
     }
@@ -178,10 +196,39 @@ const resetPassword = async (req, res) => {
   }
 };
 
+//get all user without user current
+const getAllCurrent = async (req, res) => {
+  try {
+    const user = req.user;
+    const results = await userModel.getAllCurrent(user.username);
+    if (results.length === 0) {
+      return res.status(409).json({ message: "No user without current user" });
+    }
+    return res.status(200).json({ users: results });
+  } catch (error) {
+    console.log("ERROR GET ALL", error);
+    return res.status(500).json({ message: "Error when get all user" });
+  }
+};
+//get all user
+const getAll = async (req, res) => {
+  try {
+    const results = await userModel.getAll();
+
+    return res.status(200).json({ users: results });
+  } catch (error) {
+    return res.status(500).json({ message: "Error when get all user" });
+  }
+};
 module.exports = {
   registerUser,
   loginUser,
   resetPassword,
   generateToken,
   forgotPassword,
+  updateInfor,
+  updatePassword,
+  deleteUser,
+  getAllCurrent,
+  getAll,
 };

@@ -13,6 +13,16 @@ public class AppMessage {
     private String token;
     @SerializedName("user")
     private User user;
+    @SerializedName("users")
+    private List<User> listUser;
+
+    public List<User> getListUser() {
+        return listUser;
+    }
+
+    public void setListUser(List<User> listUser) {
+        this.listUser = listUser;
+    }
 
     public String getMessage() {
         return message;

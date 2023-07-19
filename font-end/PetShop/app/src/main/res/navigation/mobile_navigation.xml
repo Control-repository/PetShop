@@ -39,4 +39,13 @@
     <fragment android:id="@+id/nav_exit"
         android:name="com.example.petshop.ui.HomeFragment"
         tools:layout="@layout/fragment_home" />
+    <fragment android:id="@+id/nav_item_product"
+        android:name="com.example.petshop.ui.item_product.ItemProductFragment"
+        tools:layout="@layout/fragment_item_product"
+        android:label="Detail Product"/>
+
+    <!-- Định nghĩa các hành động điều hướng giữa các Fragment -->
+    <action
+        android:id="@+id/action_product_to_itemProduct"
+        app:destination="@id/nav_item_product" />
 </navigation>

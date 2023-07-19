@@ -77,23 +77,27 @@ public class RegisterActivity extends AppCompatActivity {
         String email = ip_email.getEditText().getText().toString().trim();
         String confirm_password = ip_confirm_password.getEditText().getText().toString().trim();
 
-        if(CheckInput.validateInput(username,ip_username)&&CheckInput.validateInput(fullname,ip_fullname)
-            &&CheckInput.validateInput(password,ip_password)&&CheckInput.validateInput(email,ip_email)
-                &&CheckInput.validateInput(confirm_password,ip_confirm_password)){
+        if(validateInput()){
             if(!password.equals(confirm_password)){
                 ip_confirm_password.setError("Mật khẩu không chính xác");
+                return;
             }else{
                 ip_confirm_password.setError(null);
             }
+
             dialog.setMessage("Loading...");
             dialog.show();
-            ApiService apiService = RetroClient.getApiService();
 
             User user = new User();
             user.setFullName(fullname);
             user.setEmail(email);
             user.setUsername(username);
             user.setPassword(password);
+            user.setRole(1);
+
+            //retrofit
+            RetroClient.setContext(getApplicationContext());
+            ApiService apiService = RetroClient.getApiService();
 
             //Call
             Call<AppMessage> call = apiService.registerUser(user);
@@ -115,12 +119,18 @@ public class RegisterActivity extends AppCompatActivity {
                             // Sử dụng lớp mô hình (model class) để chuyển đổi dữ liệu phản hồi thành đối tượng tương ứng
                             AppMessage errorResponse = gson.fromJson(errorJson, AppMessage.class);
                             String message = errorResponse.getMessage();
+                            //Hiện thị lỗi tại các input tương ứng
+                            if(response.code()== 409){
+                                ip_username.setError(message);
+                            }else{
+                                ip_username.setError(null);
+                            }
 
-                        if(response.code()== 409){
-                            ip_username.setError(message);
-                        }else{
-                            ip_username.setError(null);
-                        }
+                            if(response.code() == 400){
+                                ip_email.setError(message);
+                            }else{
+                                ip_email.setError(null);
+                            }
 
                             // Sử dụng giá trị message
                             Toast.makeText(RegisterActivity.this,message,Toast.LENGTH_SHORT).show();
@@ -147,4 +157,21 @@ public class RegisterActivity extends AppCompatActivity {
         finish();
     }
 
+    private boolean validateInput() {
+
+        String username = ip_username.getEditText().getText().toString().trim();
+        String fullname = ip_fullname.getEditText().getText().toString().trim();
+        String password = ip_password.getEditText().getText().toString().trim();
+        String email = ip_email.getEditText().getText().toString().trim();
+        String confirm_password = ip_confirm_password.getEditText().getText().toString().trim();
+
+        if(CheckInput.validateInput(username,ip_username) &&
+                CheckInput.validateInput(fullname,ip_fullname) &&
+                CheckInput.validateInput(password,ip_password) &&
+                CheckInput.validateInput(email,ip_email) &&
+                CheckInput.validateInput(confirm_password,ip_confirm_password)){
+            return true;
+        }
+        return false;
+    }
 }

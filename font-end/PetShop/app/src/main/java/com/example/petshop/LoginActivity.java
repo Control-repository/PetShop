@@ -1,6 +1,7 @@
 package com.example.petshop;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.ViewModelProvider;
 
 import android.app.ProgressDialog;
 import android.content.Context;
@@ -19,6 +20,7 @@ import com.example.petshop.models.User;
 import com.example.petshop.untils.ApiService;
 import com.example.petshop.untils.CheckInput;
 import com.example.petshop.untils.RetroClient;
+import com.example.petshop.viewmodel.UserViewModel;
 import com.google.android.material.textfield.TextInputLayout;
 import com.google.gson.Gson;
 
@@ -34,11 +36,13 @@ public class LoginActivity extends AppCompatActivity {
     private Button btn_SignIn;
     private TextView tv_miss_password,tv_register;
 
-
+    private UserViewModel userViewModel;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
+        //userviewmodel
+        userViewModel = new ViewModelProvider(this).get(UserViewModel.class);
         //mapping
         ip_password = findViewById(R.id.ip_password);
         ip_username = findViewById(R.id.ip_username);
@@ -54,7 +58,6 @@ public class LoginActivity extends AppCompatActivity {
         });
         tv_register.setOnClickListener(v->{
             startActivity(new Intent(LoginActivity.this,RegisterActivity.class));
-            finish();
         });
 
     }
@@ -81,28 +84,29 @@ public class LoginActivity extends AppCompatActivity {
                     if(response.isSuccessful()){
 
                         AppMessage signInMessage = response.body();
-                        assert signInMessage != null;
+                        assert signInMessage !=null;
                         User user = signInMessage.getUser();
 
                         if(response.body().getToken()!=null && user != null){
+                            //Luư token đăng nhập protect
                             SharedPreferences sharedPreferences = v.getContext().getSharedPreferences("Request", Context.MODE_PRIVATE);
                             SharedPreferences.Editor editor = sharedPreferences.edit();
                             editor.putString("token",response.body().getToken());
                             editor.apply();
-
-                            Bundle bundle = new Bundle();
-                            bundle.putSerializable("User", user);
+                            //Lưu user vào viewmodel để sử dụng trong ứng dụng
+                            userViewModel.setUserData(user);
+                            //Thông báo đăng nhập thành công và chuyển sang màn hình chính
                             Toast.makeText(LoginActivity.this,"Login complete!", Toast.LENGTH_SHORT).show();
                             Intent intent = new Intent(LoginActivity.this, MainActivity.class);
-                            intent.putExtras(bundle);
                             startActivity(intent);
-                            //Luư token đăng nhập protect
                             finish();
                         }
 
                     }else{
                         ResponseBody errorBody = response.errorBody();
                         try {
+                            //Nhận thông báo lỗi trong quá trình đăng nhập
+                            //Và hiện thị thông báo lên cho người dùng
                             Gson gson = new Gson();
                             AppMessage message = gson.fromJson(errorBody.string(),AppMessage.class);
                             String errorMessage = message.getMessage();

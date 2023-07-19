@@ -32,7 +32,12 @@ public class Product {
         this.imageURL = imageURL;
         this.user_username = user_username;
     }
-
+    public Product( String name, String category, double price, int quantity) {
+        this.name = name;
+        this.category = category;
+        this.price = price;
+        this.quantity = quantity;
+    }
     public int getId() {
         return id;
     }

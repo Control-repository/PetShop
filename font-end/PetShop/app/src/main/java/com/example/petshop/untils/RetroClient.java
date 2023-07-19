@@ -26,7 +26,7 @@ public class RetroClient {
                 SharedPreferences sharedPreferences = context.getSharedPreferences("Request", Context.MODE_PRIVATE);
                 String token = sharedPreferences.getString("token", "");
 
-// Thêm cookie vào header của yêu cầu
+                // Thêm cookie vào header của yêu cầu
                 Request newRequest = originalRequest.newBuilder()
                         .header("Cookie", "token=" + token)
                         .build();

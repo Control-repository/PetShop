@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@drawable/border_bottom_sheet">
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Choose"
+        android:textSize="30sp"
+        android:gravity="center"
+        android:layout_marginVertical="8dp"
+        android:textStyle="bold"
+        android:textColor="@color/black"/>
+    <LinearLayout
+        android:id="@+id/layout_show"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingStart="8dp"
+        android:layout_marginVertical="8dp">
+        <ImageView
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:src="@drawable/baseline_search_24"
+            app:tint="@color/black" />
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Show "
+            android:textSize="18dp"
+            android:textStyle="bold"
+            android:layout_gravity="center_vertical"
+            android:layout_marginStart="16dp"/>
+    </LinearLayout>
+    <LinearLayout
+        android:id="@+id/layout_edit"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingStart="8dp"
+        android:layout_marginVertical="8dp">
+        <ImageView
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:src="@drawable/baseline_edit_note_24"
+            app:tint="@color/black" />
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Edit "
+            android:textSize="18dp"
+            android:textStyle="bold"
+            android:layout_gravity="center_vertical"
+            android:layout_marginStart="16dp"/>
+    </LinearLayout>
+    <LinearLayout
+        android:id="@+id/layout_delete"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingStart="8dp"
+        android:layout_marginVertical="8dp">
+        <ImageView
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:src="@drawable/baseline_delete_24"
+            app:tint="@color/black" />
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Delete "
+            android:textSize="18dp"
+            android:textStyle="bold"
+            android:layout_gravity="center_vertical"
+            android:layout_marginStart="16dp"/>
+    </LinearLayout>
+</LinearLayout>

@@ -10,7 +10,6 @@ const products = [
       '"One Piece" không chỉ là một câu chuyện về hành trình tìm kiếm kho báu, mà còn là một tác phẩm về tình bạn, lòng dũng cảm và khát vọng tự do. Với vũ trụ rộng lớn và những nhân vật đa dạng, bộ anime và manga này đã gây tiếng vang toàn cầu và thu hút hàng triệu người hâm mộ trên khắp thế giới. "One Piece" là một cuộc phiêu lưu không thể bỏ qua, nơi mọi người có thể tìm thấy niềm vui, cảm xúc và thông điệp sâu sắc về mục tiêu và giá trị của cuộc sống.',
     imageURL:
       "https://res.cloudinary.com/dg1nlrihe/image/upload/v1686218618/PorterAnime/porter_ONE.PIECE_afwg7z.jpg",
-    user_username: "admin",
   },
   {
     name: "Youkoso Jitsuryoku Shijou Shugi no Kyoushitsu e",
@@ -24,7 +23,6 @@ const products = [
       '"Youkoso Jitsuryoku Shijou Shugi no Kyoushitsu e" mang đến một câu chuyện hấp dẫn về sự cạnh tranh và tâm lý con người trong một môi trường giáo dục đặc biệt. Đây là một bộ anime và light novel pha trộn giữa yếu tố hành động, bí ẩn và drama, đưa người xem vào những cuộc chiến tư duy và cạnh tranh khốc liệt giữa những tài năng trẻ.',
     imageURL:
       "https://res.cloudinary.com/dg1nlrihe/image/upload/v1686218622/PorterAnime/porter_Youkoso.Jitsuryoku.Shijou.Shugi.no.Kyoushitsu.e_vhu2gn.jpg",
-    user_username: "admin",
   },
   {
     name: "OverLord",
@@ -38,7 +36,6 @@ const products = [
       '"Overlord" mang đến cho khán giả một câu chuyện về thế giới ảo chuyển thành thực tại và sự thích nghi của nhân vật chính trong môi trường mới. Với yếu tố hành động, phép thuật và yếu tố RPG, bộ anime và light novel này mang đến những trận chiến độc đáo và câu chuyện tình cảm phức tạp giữa nhân vật và thế giới xung quanh.',
     imageURL:
       "https://res.cloudinary.com/dg1nlrihe/image/upload/v1686218618/PorterAnime/porter_Overlord_ebng2t.jpg",
-    user_username: "admin",
   },
   {
     name: "Haikyuu",
@@ -52,7 +49,6 @@ const products = [
       '"Haikyuu!!" không chỉ là một bộ anime và manga về bóng chuyền, mà còn là một câu chuyện về tình bạn, sự đồng lòng và phát triển cá nhân. Từ các trận đấu kịch tính cho đến những thử thách và phát triển cá nhân của mỗi nhân vật, bộ truyện này mang đến cho người xem sự cảm nhận về sự cống hiến và niềm đam mê trong cuộc sống và thể thao.',
     imageURL:
       "https://res.cloudinary.com/dg1nlrihe/image/upload/v1686218617/PorterAnime/porter_Haikyuu_mnvn34.jpg",
-    user_username: "admin",
   },
   {
     name: "Death Note",
@@ -66,7 +62,6 @@ const products = [
       '"Death Note" không chỉ là một câu chuyện về tội phạm và truy sát, mà còn đặt ra những câu hỏi đạo đức và triết lý về quyền phán xử và quyền sống còn. Bộ anime và manga này khám phá sâu sắc về tâm lý con người, quyền lực và hậu quả của việc sử dụng quyền lực đối với cá nhân và xã hội.',
     imageURL:
       "https://res.cloudinary.com/dg1nlrihe/image/upload/v1686218617/PorterAnime/porter_Death_Note_awtvkz.jpg",
-    user_username: "admin",
   },
 ];
 

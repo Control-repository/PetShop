@@ -2,23 +2,16 @@ package com.example.petshop;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.view.Menu;
+import android.widget.TextView;
 
 import com.example.petshop.models.User;
-import com.example.petshop.ui.CustomerFragment;
-import com.example.petshop.ui.HomeFragment;
-import com.example.petshop.ui.PasswordFragment;
-import com.example.petshop.ui.ProductFragment;
-import com.example.petshop.ui.UserFragment;
-import com.example.petshop.viewmodel.AppViewModel;
-import com.google.android.material.snackbar.Snackbar;
+import com.example.petshop.viewmodel.UserViewModel;
 import com.google.android.material.navigation.NavigationView;
 
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavController;
-import androidx.navigation.NavDirections;
 import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
@@ -27,12 +20,11 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.petshop.databinding.ActivityMainBinding;
 
-import java.util.Objects;
-
 public class MainActivity extends AppCompatActivity {
 
     private AppBarConfiguration mAppBarConfiguration;
-    AppViewModel userViewModel;
+    UserViewModel userViewModel;
+    TextView fullname,username;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -47,18 +39,24 @@ public class MainActivity extends AppCompatActivity {
         // Passing each menu ID as a set of Ids because each
         // menu should be considered as top level destinations.
         //get User when login successfully
-        Intent intent = getIntent();
-        userViewModel = new ViewModelProvider(this).get(AppViewModel.class);
-        if(intent !=null) {
-            Bundle bundle = intent.getExtras();
-            User user =(User) bundle.getSerializable("User");
+        userViewModel = new ViewModelProvider(this).get(UserViewModel.class);
+
+        //send user information to header navigation
+        View headerView = navigationView.getHeaderView(0);
+        fullname = headerView.findViewById(R.id.user_fullname);
+        username = headerView.findViewById(R.id.user_username);
+
+        userViewModel.getUserData().observe(this,user -> {
             if(user!=null){
-                userViewModel.setData(user);
+                fullname.setText(user.getFullName());
+                username.setText(user.getUsername());
             }
-        }
+        });
 
         mAppBarConfiguration = new AppBarConfiguration.Builder(
-                R.id.nav_home, R.id.nav_product, R.id.nav_customer, R.id.nav_password, R.id.nav_user,R.id.nav_logout,R.id.nav_exit
+                R.id.nav_home, R.id.nav_product, R.id.nav_customer, R.id.nav_password, R.id.nav_user,
+                R.id.nav_logout,R.id.nav_exit,R.id.nav_item_product
+
         )
                 .setOpenableLayout(drawer)
                 .build();
@@ -85,10 +83,13 @@ public class MainActivity extends AppCompatActivity {
 
         navController.addOnDestinationChangedListener((controller, destination, arguments) -> {
             // Kiểm tra xem Fragment hiện tại có phải là ProductFragment hoặc CustomerFragment hay không
-            boolean isProductFragment = destination.getId() == R.id.nav_product;
-            boolean isCustomerFragment = destination.getId() == R.id.nav_customer;
-            // Hiển thị hoặc ẩn FAB tùy theo kết quả kiểm tra
-            binding.appBarMain.fab.setVisibility(isProductFragment || isCustomerFragment ? View.VISIBLE : View.GONE);
+            boolean isFragment = destination.getId() == R.id.nav_product || destination.getId() == R.id.nav_customer;
+
+            if(isFragment && binding.appBarMain.fab.getVisibility() == View.GONE){
+                binding.appBarMain.fab.show();
+            }else if(!isFragment && binding.appBarMain.fab.getVisibility() == View.VISIBLE){
+                binding.appBarMain.fab.hide();
+            }
         });
 
         NavigationUI.setupActionBarWithNavController(this, navController, mAppBarConfiguration);

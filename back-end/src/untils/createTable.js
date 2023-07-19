@@ -5,9 +5,7 @@ const productTable = `CREATE TABLE IF NOT EXISTS products (
     price DECIMAL(10, 2) NOT NULL,
     quantity INT NOT NULL,
     description TEXT,
-    imageURL TEXT,
-    user_username VARCHAR(255) NOT NULL,
-    FOREIGN KEY (user_username) REFERENCES users(username) 
+    imageURL TEXT
   )`;
 const userTable = `
   CREATE TABLE IF NOT EXISTS users (
@@ -15,7 +13,8 @@ const userTable = `
     password VARCHAR(255) NOT NULL,
     email VARCHAR(255),
     fullname VARCHAR(255),
-    phone VARCHAR(10)
+    phone VARCHAR(10),
+    role INTEGER NOT NULL
   )
 `;
 const reset_pass_table = `

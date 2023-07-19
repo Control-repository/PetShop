@@ -1,9 +1,5 @@
 const mysql = require("mysql");
-const products = require("./database.example.js");
 const createTable = require("../untils/createTable.js");
-const dotenv = require("dotenv");
-
-dotenv.config();
 
 const database_name = process.env.DB_NAME;
 
@@ -47,24 +43,24 @@ connection.connect((err) => {
           return;
         } else {
           console.log("Table created Users");
-        }
-      });
-      //Create new table products
-      connection.query(createTable.productTable, (err) => {
-        if (err) {
-          console.log("Error creating table ", err);
-          return;
-        } else {
-          console.log("Table created Products");
-        }
-      });
+          //Create new table products
+          connection.query(createTable.productTable, (err) => {
+            if (err) {
+              console.log("Error creating table ", err);
+              return;
+            } else {
+              console.log("Table created Products");
+            }
+          });
 
-      connection.query(createTable.reset_pass_table, (err) => {
-        if (err) {
-          console.log("Error creating table ", err);
-          return;
-        } else {
-          console.log("Table created Token");
+          connection.query(createTable.reset_pass_table, (err) => {
+            if (err) {
+              console.log("Error creating table ", err);
+              return;
+            } else {
+              console.log("Table created Token");
+            }
+          });
         }
       });
     });
@@ -86,29 +82,5 @@ const query = (sql, value) => {
 process.on("exit", () => {
   connection.end();
 });
-// Insert the products into the MySQL database
-const insertProducts = () => {
-  for (const product of products) {
-    const sql =
-      "INSERT INTO products (name, category, price, quantity, description, imageURL,user_username) VALUES (?, ?, ?, ?, ?, ?,?)";
-    const values = [
-      product.name,
-      product.category,
-      product.price,
-      product.quantity,
-      product.description,
-      product.imageURL,
-      product.user_username,
-    ];
 
-    connection.query(sql, values, (err, result) => {
-      if (err) {
-        console.log(err);
-        return;
-      }
-      console.log(result);
-    });
-  }
-};
-
-module.exports = { query, insertProducts };
+module.exports = { query };

@@ -1,6 +1,6 @@
 const route = require("express")();
 const auth = require("../controllers/authController.js");
-
+const protect = require("../middleware/authMiddleware");
 route.post("/signin", async (req, res) => {
   const { username, password } = req.body;
   try {
@@ -31,10 +31,20 @@ route.post("/signin", async (req, res) => {
   }
 });
 
+//get all user
+route.get("/all/full", protect, auth.getAll);
+//get all user without user current
+route.get("/all/current", protect, auth.getAllCurrent);
 //thêm mới user
 route.post("/register", auth.registerUser);
 //reset password
 route.put("/reset-password/:resetToken", auth.resetPassword);
 //forgot-password
 route.post("/forgot-password", auth.forgotPassword);
+//update information user
+route.put("/update/infor", protect, auth.updateInfor);
+//update password
+route.put("/update/password", protect, auth.updatePassword);
+//delete user
+route.delete("/delete/user/:username", protect, auth.deleteUser);
 module.exports = route;

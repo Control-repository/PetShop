@@ -1,12 +1,10 @@
 const product = require("../models/product.model");
-
+const myConnection = require("../database/connect.db");
 //get All products
 const getAllProducts = async (req, res) => {
-  let { username } = req.user;
   let search = req.query.search;
   try {
-
-    const results = await product.getAll(username, search);
+    const results = await product.getAll(search);
     if (!results) {
       return res.status(400).json({ message: "Failed to get product" });
     }
@@ -20,11 +18,9 @@ const getAllProducts = async (req, res) => {
 //insert product
 const insertProduct = async (req, res) => {
   const { name, category, price, quantity, description, imageURL } = req.body;
-  const { username } = req.user;
 
   const values = {
     ...req.body,
-    user_username: username,
   };
   if (!name || !category || !price || !quantity) {
     res.status(400).json({ message: "Missing required fields" });
@@ -48,7 +44,7 @@ const updateProduct = async (req, res) => {
   const { name, category, price, quantity, description, imageURL } = req.body;
   const { id } = req.params.id;
 
-  const values = { id, ...req.body, user_username: req.user.username };
+  const values = { id, ...req.body };
 
   if (!name || !category || !price || !quantity) {
     res.status(400).json({ message: "Missing required fields" });
@@ -80,8 +76,14 @@ const getProduct = async (req, res) => {
   }
 };
 // insert databse example
-const insertProducts = (req, res) => {
-  myConnection.insertProducts(req, res);
+const insertProducts = async (req, res) => {
+  try {
+    const list = await product.insertExample();
+    return res.json({ message: "insert complete!", products: list });
+  } catch (error) {
+    console.log(error);
+    return res.json({ message: "Something wrong" });
+  }
 };
 //delete item by id
 const deleteProduct = async (req, res) => {
@@ -95,9 +97,8 @@ const deleteProduct = async (req, res) => {
 };
 //delete all product
 const deleteAllProduct = async (req, res) => {
-  const { username } = req.user;
   try {
-    await product.removeAll(username);
+    await product.removeAll();
     return res
       .status(200)
       .json({ message: "All products deleted successfully" });
