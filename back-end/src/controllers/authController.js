@@ -253,4 +253,5 @@ module.exports = {
   deleteUser,
   getAllCurrent,
   getAll,
+  logout
 };

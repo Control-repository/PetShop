@@ -49,4 +49,6 @@ route.put("/update/password", protect, auth.updatePassword);
 route.put("/udpate/all/:username", protect, auth.updateAll);
 //delete user
 route.delete("/delete/user/:username", protect, auth.deleteUser);
+//logout
+route.get("/logout", auth.logout);
 module.exports = route;

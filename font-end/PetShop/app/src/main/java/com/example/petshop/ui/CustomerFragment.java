@@ -15,6 +15,8 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.navigation.NavController;
+import androidx.navigation.fragment.NavHostFragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -42,7 +44,7 @@ public class CustomerFragment extends Fragment {
     private RecyclerView recyclerView;
     private UserAdapter userAdapter;
     public CustomerFragment(){}
-
+    NavController navController;
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_customer,container,false);
@@ -64,7 +66,7 @@ public class CustomerFragment extends Fragment {
         tv_show = view.findViewById(R.id.tv_show);
         recyclerView = view.findViewById(R.id.recycler_user);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-
+        navController = NavHostFragment.findNavController(this);
         userViewModel.getListUserData().observe(getViewLifecycleOwner(),users -> {
             if(!users.isEmpty()){
                 userAdapter.setList(users);
@@ -117,7 +119,7 @@ public class CustomerFragment extends Fragment {
         });
     }
 
-
+    //Hiện dialogBottom khi click item recyclerView
     private void showBottomDialog(User item){
         // Tạo instance của Dialog
         BottomSheetDialog dialog = new BottomSheetDialog(requireContext());
@@ -160,7 +162,24 @@ public class CustomerFragment extends Fragment {
         builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
+                RetroClient.setContext(requireContext());
+                ApiService apiService = RetroClient.getApiService();
+                Call<AppMessage> call = apiService.deleteUser(user.getUsername());
 
+                call.enqueue(new Callback<AppMessage>() {
+                    @Override
+                    public void onResponse(Call<AppMessage> call, Response<AppMessage> response) {
+                        if(response.isSuccessful()){
+                            Toast.makeText(requireContext(), response.body().getMessage(), Toast.LENGTH_SHORT).show();
+                            navController.navigateUp();
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Call<AppMessage> call, Throwable t) {
+
+                    }
+                });
             }
         });
         builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {

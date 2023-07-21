@@ -5,6 +5,7 @@ import com.example.petshop.models.User;
 
 import retrofit2.Call;
 import retrofit2.http.Body;
+import retrofit2.http.DELETE;
 import retrofit2.http.Field;
 import retrofit2.http.FormUrlEncoded;
 import retrofit2.http.GET;
@@ -14,10 +15,15 @@ import retrofit2.http.Path;
 import retrofit2.http.Query;
 
 public interface ApiService {
+    /*
+    * Gọi bên auth
+     */
     //Kiểm tra đăng nhập
     @FormUrlEncoded
     @POST("/auth/signin")
     Call<AppMessage> signIn(@Field("username") String username, @Field("password") String password);
+    @GET("/auth/logout")
+    Call<AppMessage> getLogout();
     //Reset Password user khi quên
     @FormUrlEncoded
     @PUT("/auth/reset-password/{resetToken}")
@@ -38,8 +44,16 @@ public interface ApiService {
     //update thông tin user
     @PUT("/auth/update/infor")
     Call<AppMessage> setUserInformation(@Body User user);
-
-
+    //reset password for current user
+    @FormUrlEncoded
+    @PUT("/auth/update/password")
+    Call<AppMessage> setUserPassword(@Field("password")String password);
+    //Delete user
+    @DELETE("/auth/delete/user/{username}")
+    Call<AppMessage> deleteUser(@Path("username")String username);
+    /*
+    * Gọi bên phía sản phẩm
+    */
     //lấy danh sách sản phẩm
     @GET("/products/all")
     Call<AppMessage> getAllProduct(@Query("search") String query);
