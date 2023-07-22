@@ -3,7 +3,7 @@ const userModel = require("../models/user.models");
 const Product = require("../models/product.model");
 const token = require("../models/token.reset.models");
 const { query } = require("../database/connect.db");
-
+const sendEmail = require('../untils/sendEmail')
 const crypto = require("crypto");
 
 //create token
@@ -168,12 +168,12 @@ const forgotPassword = async (req, res) => {
 
     const subject = "Password Reset Request";
     const send_to = email;
-    const sent_from = process.env.EMAIL_USER;
+    const sent_from = process.env.EMAIL_USERNAME;
 
-    const message = `
-  Your token to reset password: ${resetToken}
+    const message = `<p>Hello ${result[0].username},</p>
+  <p>Your token to reset password: ${resetToken}.</p>
   `;
-    // sendEmail(subject, message, send_to, sent_from);
+    // sendEmail(subject, message, send_to, sent_from,send_to);
     res.status(200).json({
       success: true,
       message: "Reset Email Sent",
@@ -196,13 +196,16 @@ const resetPassword = async (req, res) => {
       .createHash("sha256")
       .update(resetToken)
       .digest("hex");
-
+    const date = new Date();
     // Find token in DB
-    const tokens = await token.getToken(hashedToken, new Date());
+    console.log(date)
+    let  user_username="";
+    const tokens = await token.getToken(hashedToken, date);
     if (!tokens) {
       return res.status(404).json({ message: "Invalid or Expired Token" });
+    } else{
+      user_username  = tokens[0].user_username;
     }
-    const { user_username } = tokens[0];
     // Update password
     const isUpdate = await userModel.updatePassword(user_username, password);
     if (isUpdate.length === 0) {

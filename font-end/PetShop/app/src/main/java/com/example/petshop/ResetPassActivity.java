@@ -96,4 +96,9 @@ public class ResetPassActivity extends AppCompatActivity {
         startActivity(new Intent(ResetPassActivity.this,LoginActivity.class));
         finish();
     }
+
+    @Override
+    public void onBackPressed() {
+        startActivity(new Intent(ResetPassActivity.this, LoginActivity.class));
+    }
 }

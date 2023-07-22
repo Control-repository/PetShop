@@ -11,7 +11,7 @@ Token.getToken = async (username) => {
 //get Token
 Token.getToken = async (token, expiresAt) => {
   let questionQuery = `SELECT * from reset_password_token WHERE token = ? AND expiresAt >=?`;
-
+  console.log("Reset ",expiresAt)
   return await query(questionQuery, [token, expiresAt]);
 };
 
@@ -19,6 +19,7 @@ Token.getToken = async (token, expiresAt) => {
 Token.insert = async (username, token) => {
   const create_at = new Date();
   const expiresAt = new Date(create_at.getTime() + 30 * (60 * 1000));
+  console.log("Insert ",expiresAt)
   let questionQuery = `INSERT INTO reset_password_token(user_username,token,create_at,expiresAt) VALUES(?,?,?,?)`;
   return await query(questionQuery, [username, token, create_at, expiresAt]);
 };

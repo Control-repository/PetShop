@@ -23,7 +23,7 @@ public interface ApiService {
     @POST("/auth/signin")
     Call<AppMessage> signIn(@Field("username") String username, @Field("password") String password);
     @GET("/auth/logout")
-    Call<AppMessage> getLogout();
+    Call<Void> getLogout();
     //Reset Password user khi quên
     @FormUrlEncoded
     @PUT("/auth/reset-password/{resetToken}")

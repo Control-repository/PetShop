@@ -2,7 +2,10 @@ package com.example.petshop.ui;
 
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -21,6 +24,8 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.Toast;
 
+import com.example.petshop.LoginActivity;
+import com.example.petshop.MainActivity;
 import com.example.petshop.R;
 import com.example.petshop.models.AppMessage;
 import com.example.petshop.models.User;
@@ -43,6 +48,8 @@ public class UserFragment extends Fragment {
     private static boolean isOpen =false;
     private TextInputLayout ip_fullname,ip_email,ip_phone;
     private Button btn_change;
+    private ApiService apiService ;
+    private  SharedPreferences sharedPreferences;
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         setHasOptionsMenu(true);
@@ -57,7 +64,10 @@ public class UserFragment extends Fragment {
         ip_email = view.findViewById(R.id.ip_email_user);
         ip_phone = view.findViewById(R.id.ip_phone_user);
         btn_change = view.findViewById(R.id.btn_change);
-
+        RetroClient.setContext(requireContext());
+        apiService = RetroClient.getApiService();
+        //phần lưu token
+        sharedPreferences = requireContext().getSharedPreferences("Request", Context.MODE_PRIVATE);
         return view;
     }
 
@@ -108,13 +118,13 @@ public class UserFragment extends Fragment {
             builder.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
-
+                    sendToDeleteUser();
                 }
             });
             builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
-
+                    dialog.dismiss();
                 }
             });
             AlertDialog dialog = builder.create();
@@ -131,6 +141,7 @@ public class UserFragment extends Fragment {
         btn_change.setVisibility(isEnable ?View.GONE:View.VISIBLE);
     }
 
+    //Thay đổi thông tin của người dùng đang đăng nhập
     private void sendToChangeInformationUser() {
         ProgressDialog dialog = new ProgressDialog(requireContext());
         dialog.setMessage("Loading...");
@@ -179,6 +190,45 @@ public class UserFragment extends Fragment {
 
     }
 
+    //Xóa nguời dùng hiện tại và logout ra màn hình đăng nhập
+    private void sendToDeleteUser(){
+        if(thisUser!=null){
+            Call<AppMessage> call = apiService.deleteUser(thisUser.getUsername());
+            call.enqueue(new Callback<AppMessage>() {
+                @Override
+                public void onResponse(Call<AppMessage> call, Response<AppMessage> response) {
+                    if (response.isSuccessful()) {
+                        AppMessage message = response.body();
+                        String messageStr = message.getMessage();
+
+                        Call<Void> logoutCall = apiService.getLogout();
+                        logoutCall.enqueue(new Callback<Void>() {
+                            @Override
+                            public void onResponse(Call<Void> call, Response<Void> response) {
+                                if(response.isSuccessful()){
+                                    Toast.makeText(requireContext(), messageStr, Toast.LENGTH_SHORT).show();
+                                    sharedPreferences.edit().remove("token").apply();
+                                    startActivity(new Intent(requireContext(), LoginActivity.class));
+                                    requireActivity().finish();
+                                }
+                            }
+                            @Override
+                            public void onFailure(Call<Void> call, Throwable t) {
+                                Toast.makeText(requireContext(), "Something wrong with logout!", Toast.LENGTH_SHORT).show();
+                            }
+                        });
+
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<AppMessage> call, Throwable t) {
+                    Toast.makeText(requireContext(), "Something wrong with delete!", Toast.LENGTH_SHORT).show();
+                }
+            });
+
+        }
+    }
     private boolean validateInput(){
         String fullname = ip_fullname.getEditText().getText().toString();
         String phone = ip_phone.getEditText().getText().toString();

@@ -81,7 +81,7 @@ public class MainActivity extends AppCompatActivity {
         //logout account or exit app
         navigationView.setNavigationItemSelectedListener(item -> {
             if (item.getItemId() == R.id.nav_logout) {
-
+                logOut();
                 return true;
             }else if (item.getItemId() == R.id.nav_exit) {
                 finishAffinity();
@@ -126,13 +126,12 @@ public class MainActivity extends AppCompatActivity {
     private void logOut(){
         RetroClient.setContext(getApplicationContext());
         ApiService apiService = RetroClient.getApiService();
-        Call<AppMessage> call = apiService.getLogout();
-        call.enqueue(new Callback<AppMessage>() {
+        Call<Void> call = apiService.getLogout();
+        call.enqueue(new Callback<Void>() {
             @Override
-            public void onResponse(Call<AppMessage> call, Response<AppMessage> response) {
+            public void onResponse(Call<Void> call, Response<Void> response) {
                 if(response.isSuccessful()){
-
-                    Toast.makeText(MainActivity.this, response.body().getMessage(), Toast.LENGTH_SHORT).show();
+                    Toast.makeText(MainActivity.this, "Logout!", Toast.LENGTH_SHORT).show();
                     SharedPreferences sharedPreferences = getSharedPreferences("Request", Context.MODE_PRIVATE);
                     sharedPreferences.edit().remove("token").apply();
                     startActivity(new Intent(MainActivity.this, LoginActivity.class));
@@ -141,7 +140,7 @@ public class MainActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onFailure(Call<AppMessage> call, Throwable t) {
+            public void onFailure(Call<Void> call, Throwable t) {
                 Toast.makeText(MainActivity.this, "Something wrong!", Toast.LENGTH_SHORT).show();
             }
         });

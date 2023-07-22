@@ -13,7 +13,7 @@ import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
 public class RetroClient {
-    private static final String ROOT_URL = "http:192.168.15.136:3000/";
+    private static final String ROOT_URL = "http://192.168.15.136:3000/";
     private static Context context;
     private static Retrofit getRetrofitInstance(){
         OkHttpClient.Builder httpClient = new OkHttpClient.Builder();
