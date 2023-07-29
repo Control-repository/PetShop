@@ -26,10 +26,10 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder>{
     public void setList(List<User> list) {
         this.list = list;
     }
-    private ItemClickListener onItemClickListener;
+    private static ItemClickListener onItemClickListener;
 
     public void setOnItemClickListener(ItemClickListener onItemClickListener) {
-        this.onItemClickListener = onItemClickListener;
+        UserAdapter.onItemClickListener = onItemClickListener;
     }
 
     @NonNull
@@ -50,13 +50,24 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder>{
             } else{
                 holder.tv_role.setText("User");
             }
-
         }
+        holder.itemView.setOnClickListener(v -> {
+            if (onItemClickListener != null) {
+                onItemClickListener.OnItemClick(v, position);
+            }
+        });
     }
 
     @Override
     public int getItemCount() {
         return list.size();
+    }
+
+    public User getItem(int position){
+        if(list ==null || position> list.size()){
+        return null;
+        }
+        return list.get(position);
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder {
@@ -67,16 +78,6 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder>{
             tv_phone = itemView.findViewById(R.id.tv_phone_user);
             tv_role = itemView.findViewById(R.id.tv_role_user);
 
-            itemView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    int position = getAdapterPosition();
-                    if (position != RecyclerView.NO_POSITION && onItemClickListener != null) {
-                        User item = list.get(position);
-                        onItemClickListener.onItemUserClick(item);
-                    }
-                }
-            });
         }
     }
 }

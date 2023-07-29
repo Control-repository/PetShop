@@ -10,7 +10,9 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.petshop.R;
+import com.example.petshop.interfaces.ItemClickListener;
 import com.example.petshop.models.Product;
+import com.example.petshop.models.User;
 import com.example.petshop.utils.DecimalValue;
 import com.squareup.picasso.Picasso;
 
@@ -26,6 +28,13 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ViewHold
     public void setProductList(List<Product> list){
         this.productList = list;
     }
+
+    private static ItemClickListener onItemClickListener;
+
+    public void setOnItemClickListener(ItemClickListener onItemClickListener) {
+        ProductAdapter.onItemClickListener = onItemClickListener;
+    }
+
     @NonNull
     @Override
     public ProductAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -42,10 +51,24 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ViewHold
             holder.tv_name.setText(product.getName());
             holder.tv_price.setText("$ "+ DecimalValue.formatPrice(product.getPrice()));
             holder.tv_category.setText(product.getCategory());
-            if(!product.getImageURL().isEmpty()){
+            if(product.getImageURL() !=null){
                 Picasso.get().load(product.getImageURL()).resize(200,200).into(holder.image_product);
+            }else{
+                holder.image_product.setImageResource(R.drawable.pet_shop);
             }
+            holder.itemView.setOnClickListener(v->{
+                if(onItemClickListener !=null){
+                    onItemClickListener.OnItemClick(v,position);
+                }
+            });
         }
+    }
+
+    public Product getItem(int position){
+        if(productList ==null || position> productList.size()){
+            return null;
+        }
+        return productList.get(position);
     }
 
     @Override

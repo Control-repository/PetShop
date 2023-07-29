@@ -1,5 +1,13 @@
 const product = require("../models/product.model");
-const myConnection = require("../database/connect.db");
+const cloudinary = require("cloudinary").v2;
+
+//cấu hình cloudinary
+cloudinary.config({
+  cloud_name: "dg1nlrihe",
+  api_key: "618714617838561",
+  api_secret: process.env.API_SECRET_CLOUDINARY,
+});
+
 //get All products
 const getAllProducts = async (req, res) => {
   let search = req.query.search;
@@ -17,47 +25,75 @@ const getAllProducts = async (req, res) => {
 
 //insert product
 const insertProduct = async (req, res) => {
-  const { name, category, price, quantity, description, imageURL } = req.body;
-
   const values = {
     ...req.body,
   };
-  if (!name || !category || !price || !quantity) {
-    res.status(400).json({ message: "Missing required fields" });
-    return;
-  }
-
+  //kiểm tra tải ảnh lên server
   try {
-    const result = await product.insert(values);
-    if (!result) {
-      return res.status(500).json({ message: "Failed to insert product" });
-    }
+    if (req.file) {
+      // Gửi ảnh lên Cloudinary
+      const cloudinary_image = await cloudinary.uploader.upload(req.file.path, {
+        folder: "PorterAnime",
+      });
+      values.imageURL = cloudinary_image.secure_url;
+      const result = await product.insert(values);
 
-    return res.status(200).json({ message: "Product inserted successfully" });
+      if (!result) {
+        //khi có lỗi xảy ra sẽ xóa bỏ hình ảnh trong cloudinary
+        await cloudinary.uploader.destroy(cloudinary_image.public_id);
+        console.log("Lỗi ");
+        return res.status(500).json({ message: "Internal Server Error" });
+      }
+      return res.status(200).json({ message: "Product inserted successfully" });
+    } else {
+      //Trường hợp không có image
+      const result = await product.insert(values);
+
+      if (!result) {
+        console.log("Lỗi");
+        return res.status(500).json({ message: "Internal Server Error" });
+      }
+      return res.status(200).json({ message: "Product inserted successfully" });
+    }
   } catch (error) {
-    return res.status(500).json({ message: "Internal Server Error" });
+    //khi có lỗi xảy ra sẽ xóa bỏ hình ảnh trong cloudinary
+    console.error("Lỗi khi tải lên ảnh lên Cloudinary:", error);
   }
 };
 
 //update information product
 const updateProduct = async (req, res) => {
   const { name, category, price, quantity, description, imageURL } = req.body;
-  const { id } = req.params.id;
+  const id = req.params.id;
 
-  const values = { id, ...req.body };
-
-  if (!name || !category || !price || !quantity) {
-    res.status(400).json({ message: "Missing required fields" });
-    return;
-  }
+  const values = { id, name, category, price, quantity, description, imageURL };
   try {
-    const result = await product.update(values);
-    if (!result) {
-      return res.status(500).json({ message: "Failed to update product" });
+    //Khi lựa chọn ảnh trong máy
+    if (req.file) {
+      // Gửi ảnh lên Cloudinary
+      const cloudinary_image = await cloudinary.uploader.upload(req.file.path, {
+        folder: "PorterAnime",
+      });
+      values.imageURL = cloudinary_image.secure_url;
+      const result = await product.update(values);
+      if (!result) {
+        //khi có lỗi xảy ra sẽ xóa bỏ hình ảnh trong cloudinary
+        await cloudinary.uploader.destroy(cloudinary_image.public_id);
+        console.log("Lỗi ");
+        return res.status(500).json({ message: "Failed to updated product" });
+      }
+      return res.status(200).json({ message: "Product updated successfully" });
+    } else {
+      //Khi không có ảnh
+      const result = await product.update(values);
+      if (!result) {
+        console.log("lỗi");
+        return res.status(500).json({ message: "Internal Server Error" });
+      }
+      return res.status(200).json({ message: "Product updated successfully" });
     }
-
-    return res.status(200).json({ message: "Product inserted successfully" });
   } catch (error) {
+    console.log("ERROR UPDATE PRODUCT", error);
     return res.status(500).json({ message: "Internal Server Error" });
   }
 };
@@ -92,6 +128,7 @@ const deleteProduct = async (req, res) => {
     await product.remove(id);
     return res.status(200).json({ message: "Delete successfully!" });
   } catch (error) {
+    console.log("DELETE ERROR", error);
     return res.status(500).json({ message: "Internal Server Error" });
   }
 };

@@ -1,7 +1,11 @@
 package com.example.petshop.interfaces;
 
+import android.view.View;
+
+import com.example.petshop.models.Product;
 import com.example.petshop.models.User;
 
 public interface ItemClickListener {
-    void onItemUserClick(User item);
+    void OnItemClick(View view, int position);
+
 }

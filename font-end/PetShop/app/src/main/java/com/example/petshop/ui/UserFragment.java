@@ -15,6 +15,7 @@ import androidx.lifecycle.ViewModelProvider;
 
 import android.text.TextUtils;
 import android.util.Log;
+import android.util.Patterns;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -84,11 +85,14 @@ public class UserFragment extends Fragment {
             }
 
         });
-
+        phoneFocusListener();
+        emailFocusListener();
         btn_change.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                sendToChangeInformationUser();
+                if(validateInput()) {
+                    sendToChangeInformationUser();
+                }
             }
         });
     }
@@ -149,7 +153,7 @@ public class UserFragment extends Fragment {
         String phone = ip_phone.getEditText().getText().toString();
         String email = ip_email.getEditText().getText().toString();
 
-        if(validateInput()){
+
             RetroClient.setContext(requireContext());
             ApiService apiService = RetroClient.getApiService();
 
@@ -176,17 +180,13 @@ public class UserFragment extends Fragment {
                                 e.printStackTrace();
                             }
                         }
-
-
                     }
                 }
-
                 @Override
                 public void onFailure(Call<AppMessage> call, Throwable t) {
 
                 }
             });
-        }
 
     }
 
@@ -230,25 +230,48 @@ public class UserFragment extends Fragment {
         }
     }
     private boolean validateInput(){
-        String fullname = ip_fullname.getEditText().getText().toString();
-        String phone = ip_phone.getEditText().getText().toString();
-        String email = ip_email.getEditText().getText().toString();
+        String fullnameEror = ip_fullname.getEditText().getError().toString();
+        String phoneError = ip_phone.getEditText().getError().toString();
+        String emailError = ip_email.getEditText().getError().toString();
 
-        if(TextUtils.isEmpty(fullname)){
-            ip_fullname.setError("Vui lòng không để trống tên");
-            return false;
+        return fullnameEror == null && phoneError == null && emailError == null;
+    }
+
+    private void phoneFocusListener(){
+        ip_phone.getEditText().setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View v, boolean hasFocus) {
+                ip_phone.getEditText().setError(validPhone());
+            }
+        });
+    }
+
+    private CharSequence validPhone() {
+        String phoneText = ip_phone.getEditText().getText().toString().trim();
+        if(phoneText.length() !=10){
+            return "phải đủ 10 số";
         }
-        if(TextUtils.isEmpty(phone)){
-            ip_phone.setError("Vui lòng không để trống số điện thoại");
-            return false;
+
+        if(phoneText.matches(".*[0-9].*")){
+            return "phải là số";
         }
-        if(TextUtils.isEmpty(email)){
-            ip_email.setError("Vui lòng không để trống email");
-            return false;
+        return null;
+    }
+    private void emailFocusListener(){
+        ip_email.getEditText().setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View v, boolean hasFocus) {
+                ip_email.getEditText().setError(validEmail());
+            }
+        });
+    }
+
+    private CharSequence validEmail() {
+        String emailText = ip_email.getEditText().getText().toString().trim();
+
+        if(!Patterns.EMAIL_ADDRESS.matcher(emailText).matches()){
+            return "Sai định dạng email";
         }
-        ip_fullname.setError(null);
-        ip_phone.setError(null);
-        ip_email.setError(null);
-        return true;
+        return null;
     }
 }

@@ -70,7 +70,7 @@ public class MainActivity extends AppCompatActivity {
 
         mAppBarConfiguration = new AppBarConfiguration.Builder(
                 R.id.nav_home, R.id.nav_product, R.id.nav_customer, R.id.nav_password, R.id.nav_user,
-                R.id.nav_logout,R.id.nav_exit,R.id.nav_item_product
+                R.id.nav_logout,R.id.nav_exit
 
         )
                 .setOpenableLayout(drawer)

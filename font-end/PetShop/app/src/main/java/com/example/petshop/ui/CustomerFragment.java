@@ -22,8 +22,10 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.petshop.R;
 import com.example.petshop.adapter.UserAdapter;
+import com.example.petshop.dialog.UserBottomDialog;
 import com.example.petshop.interfaces.ItemClickListener;
 import com.example.petshop.models.AppMessage;
+import com.example.petshop.models.Product;
 import com.example.petshop.models.User;
 import com.example.petshop.utils.ApiService;
 import com.example.petshop.utils.RetroClient;
@@ -79,8 +81,8 @@ public class CustomerFragment extends Fragment {
 
         userAdapter.setOnItemClickListener(new ItemClickListener() {
             @Override
-            public void onItemUserClick(User item) {
-                showBottomDialog(item);
+            public void OnItemClick(View view, int position) {
+                showBottomDialog((User) userAdapter.getItem(position));
             }
         });
     }
@@ -142,7 +144,6 @@ public class CustomerFragment extends Fragment {
                 layout_delete.setVisibility(View.VISIBLE);
             }
         });
-
         //click delete
         layout_delete.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -171,7 +172,6 @@ public class CustomerFragment extends Fragment {
                     public void onResponse(Call<AppMessage> call, Response<AppMessage> response) {
                         if(response.isSuccessful()){
                             Toast.makeText(requireContext(), response.body().getMessage(), Toast.LENGTH_SHORT).show();
-                            navController.navigateUp();
                         }
                     }
 

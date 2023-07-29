@@ -44,6 +44,8 @@
                 <com.google.android.material.textfield.TextInputEditText
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:inputType="textEmailAddress"
+                    android:lines="1"
                     android:hint="Email" />
             </com.google.android.material.textfield.TextInputLayout>
 
@@ -52,11 +54,15 @@
                 style="@style/input_layout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                app:counterEnabled="true"
+                app:counterMaxLength="10"
                 android:enabled="false">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:lines="1"
+                    android:inputType="phone"
                     android:hint="Phone" />
             </com.google.android.material.textfield.TextInputLayout>
 

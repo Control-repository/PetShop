@@ -46,6 +46,11 @@
 
     <!-- Định nghĩa các hành động điều hướng giữa các Fragment -->
     <action
-        android:id="@+id/action_product_to_itemProduct"
-        app:destination="@id/nav_item_product" />
+        android:id="@+id/action_to_itemProduct"
+        app:destination="@id/nav_item_product"
+        app:popUpToInclusive="true"/>
+    <action
+        android:id="@+id/action_to_product"
+        app:destination="@id/nav_product"
+        app:popUpToInclusive="true"/>
 </navigation>
