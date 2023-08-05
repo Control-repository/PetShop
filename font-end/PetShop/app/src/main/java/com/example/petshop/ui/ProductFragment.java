@@ -87,6 +87,7 @@ public class ProductFragment extends Fragment {
         View view =inflater.inflate(R.layout.fragment_product,container,false);
         // Lắng nghe sự thay đổi của LiveData để nhận thông tin User
         productViewModel = new ViewModelProvider(requireActivity()).get(ProductViewModel.class);
+
         userViewModel = new ViewModelProvider(requireActivity()).get(UserViewModel.class);
         // Khởi tạo các view và adapter
         productAdapter = new ProductAdapter(new ArrayList<>());
@@ -169,8 +170,8 @@ public class ProductFragment extends Fragment {
     //Delete Product
     public void clickDelete_object(Product product){
         AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
-        builder.setTitle("Delete user");
-        builder.setMessage("Are you sure delete this user?");
+        builder.setTitle("Delete product");
+        builder.setMessage("Are you sure delete this product?");
         builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {

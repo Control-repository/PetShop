@@ -353,8 +353,8 @@ public class ItemProductFragment extends Fragment {
                 } else {
                     try {
                         ResponseBody error = response.errorBody();
-                        AppMessage appMessage = gson.fromJson(error.string(),AppMessage.class);
-                        Toast.makeText(requireContext(), appMessage.getMessage(), Toast.LENGTH_SHORT).show();
+                            AppMessage appMessage = gson.fromJson(error.string(),AppMessage.class);
+                            Toast.makeText(requireContext(), appMessage.getMessage(), Toast.LENGTH_SHORT).show();
                     }catch (Exception e){
                         e.printStackTrace();
                     }
