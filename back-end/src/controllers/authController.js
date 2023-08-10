@@ -3,7 +3,7 @@ const userModel = require("../models/user.models");
 const Product = require("../models/product.model");
 const token = require("../models/token.reset.models");
 const { query } = require("../database/connect.db");
-const sendEmail = require('../untils/sendEmail')
+const sendEmail = require("../untils/sendEmail");
 const crypto = require("crypto");
 
 //create token
@@ -13,15 +13,13 @@ const generateToken = (id) => {
 
 //thêm mới một user
 const registerUser = async (req, res) => {
-  const { username, password, fullname, email, phone,role } = req.body;
+  const { password, fullname, email, phone, role } = req.body;
 
-  if (!username || !password || !email) {
+  if (!password || !email) {
     return res.status(400).json({ message: "Missing required fields" });
   }
 
   try {
-    await userModel.getByUsername(username);
-
     const isCheck = await userModel.getByEmail(email);
     if (isCheck.length > 0) {
       return res.status(400).json({ message: "Email already exists" });
@@ -50,10 +48,9 @@ const registerUser = async (req, res) => {
   }
 };
 
-const loginUser = async (username, password) => {
-  const questionQuery =
-    "SELECT * FROM users WHERE username = ? AND password = ?";
-  const values = [username, password];
+const loginUser = async (email, password) => {
+  const questionQuery = "SELECT * FROM users WHERE email = ? AND password = ?";
+  const values = [email, password];
 
   try {
     const result = await query(questionQuery, values);
@@ -80,9 +77,9 @@ const logout = (req, res) => {
 };
 //update all information for user
 const updateAll = async (req, res) => {
-  const { username } = req.params;
+  const { email } = req.params;
   try {
-    const values = { username, ...req.body };
+    const values = { ...req.body, email };
     await userModel.updateAll(values);
     return res.status(200).json({ message: "User change successfully!" });
   } catch (error) {
@@ -94,11 +91,11 @@ const updateAll = async (req, res) => {
 };
 //update User
 const updateInfor = async (req, res) => {
-  const { username } = req.user;
+  const { email } = req.user;
 
-  const values = { username, ...req.body };
+  const values = { ...req.body, email };
   try {
-    const result = await userModel.getByUsername(username);
+    const result = await userModel.getByEmail(email);
     if (result.length !== 0) {
       const user = await userModel.update(values);
       return res
@@ -118,9 +115,9 @@ const updateInfor = async (req, res) => {
 //update password
 const updatePassword = async (req, res) => {
   const { password } = req.body;
-  const { username } = req.user;
+  const { email } = req.user;
   try {
-    await userModel.updatePassword(username, password);
+    await userModel.updatePassword(email, password);
     return res.status(200).json({ message: "Change password successfully!" });
   } catch (error) {
     return res.status(500).json({ message: "Error to change Password " });
@@ -128,14 +125,13 @@ const updatePassword = async (req, res) => {
 };
 //delete user
 const deleteUser = async (req, res) => {
-  const { username } = req.params;
+  const { email } = req.params;
   try {
-    const result = userModel.getByUsername(username);
+    const result = userModel.getByEmail(email);
     if (!result) {
       return res.status(400).json({ message: "Not found username" });
     }
-    await userModel.remove(username);
-    await Product.removeAll(username);
+    await userModel.remove(email);
     return res.status(200).json({ message: "Remove succesfully!" });
   } catch (error) {
     return res.status(500).json({ message: "Error to delete user" });
@@ -150,8 +146,7 @@ const forgotPassword = async (req, res) => {
     if (result.length === 0) {
       return res.status(500).json({ message: "Not found email" });
     }
-    const username = result[0].username;
-    await token.delete(username);
+    await token.delete(email);
 
     // Create Reste Token
     let resetToken = crypto.randomBytes(3).toString("hex");
@@ -164,13 +159,13 @@ const forgotPassword = async (req, res) => {
       .digest("hex");
 
     // Save Token to DB
-    await token.insert(result[0].username, hashedToken);
+    await token.insert(email, hashedToken);
 
     const subject = "Password Reset Request";
     const send_to = email;
     const sent_from = process.env.EMAIL_USERNAME;
 
-    const message = `<p>Hello ${result[0].username},</p>
+    const message = `<p>Hello ${email},</p>
   <p>Your token to reset password: ${resetToken}.</p>
   `;
     // sendEmail(subject, message, send_to, sent_from,send_to);
@@ -198,16 +193,16 @@ const resetPassword = async (req, res) => {
       .digest("hex");
     const date = new Date();
     // Find token in DB
-    console.log(date)
-    let  user_username="";
+    console.log(date);
     const tokens = await token.getToken(hashedToken, date);
     if (!tokens) {
       return res.status(404).json({ message: "Invalid or Expired Token" });
-    } else{
-      user_username  = tokens[0].user_username;
     }
     // Update password
-    const isUpdate = await userModel.updatePassword(user_username, password);
+    const isUpdate = await userModel.updatePassword(
+      tokens[0].user_email,
+      password
+    );
     if (isUpdate.length === 0) {
       return res.status(400).json({ message: "Wrong to update password" });
     }
@@ -224,7 +219,7 @@ const resetPassword = async (req, res) => {
 const getAllCurrent = async (req, res) => {
   try {
     const user = req.user;
-    const results = await userModel.getAllCurrent(user.username);
+    const results = await userModel.getAllCurrent(user.email);
     if (results.length === 0) {
       return res.status(409).json({ message: "No user without current user" });
     }
@@ -256,5 +251,5 @@ module.exports = {
   deleteUser,
   getAllCurrent,
   getAll,
-  logout
+  logout,
 };

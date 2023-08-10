@@ -43,26 +43,39 @@ connection.connect((err) => {
           return;
         } else {
           console.log("Table created Users");
-          //Create new table products
-          connection.query(createTable.productTable, (err) => {
-            if (err) {
-              console.log("Error creating table ", err);
-              return;
-            } else {
-              console.log("Table created Products");
-            }
-          });
-
-          connection.query(createTable.reset_pass_table, (err) => {
-            if (err) {
-              console.log("Error creating table ", err);
-              return;
-            } else {
-              console.log("Table created Token");
-            }
-          });
         }
       });
+      //Create new table products
+      connection.query(createTable.productTable, (err) => {
+        if (err) {
+          console.log("Error creating table ", err);
+          return;
+        } else {
+          console.log("Table created Products");
+        }
+      });
+
+      connection.query(createTable.reset_pass_table, (err) => {
+        if (err) {
+          console.log("Error creating table ", err);
+          return;
+        } else {
+          console.log("Table created Token");
+        }
+      });
+      connection.query(
+        `INSERT INTO users(email,password,fullname,phone,role) VALUES(?,?,?,?,?)
+        ON DUPLICATE KEY UPDATE email = VALUES(email)`,
+        ["anhlaaikgz12@gmail.com", "123456", "Trương Công Nghĩa", 339214624, 0],
+        (err, result) => {
+          if (err) {
+            console.log(`Can't insert user item`, err);
+            return;
+          } else {
+            console.log("User inserted");
+          }
+        }
+      );
     });
   });
 });

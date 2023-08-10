@@ -9,9 +9,8 @@ const productTable = `CREATE TABLE IF NOT EXISTS products (
   )`;
 const userTable = `
   CREATE TABLE IF NOT EXISTS users (
-    username VARCHAR(255) PRIMARY KEY,
+    email VARCHAR(255) PRIMARY KEY,
     password VARCHAR(255) NOT NULL,
-    email VARCHAR(255),
     fullname VARCHAR(255),
     phone VARCHAR(10),
     role INTEGER NOT NULL
@@ -20,12 +19,12 @@ const userTable = `
 const reset_pass_table = `
 CREATE TABLE IF NOT EXISTS reset_password_token(
   id INT PRIMARY KEY AUTO_INCREMENT,
-  user_username VARCHAR(50) NOT NULL,
+  user_email VARCHAR(255) NOT NULL,
   token VARCHAR(255) NOT NULL,
   create_at DATETIME DEFAULT CURRENT_TIMESTAMP,
   expiresAt DATETIME DEFAULT CURRENT_TIMESTAMP,
-  FOREIGN KEY (user_username) REFERENCES users(username) 
-);
+  FOREIGN KEY (user_email) REFERENCES users(email) 
+)
 `;
 
 module.exports = {

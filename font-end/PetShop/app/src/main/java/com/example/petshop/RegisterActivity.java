@@ -7,6 +7,8 @@ import androidx.appcompat.widget.Toolbar;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.TextUtils;
+import android.util.Patterns;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
@@ -31,7 +33,7 @@ import retrofit2.Response;
 
 public class RegisterActivity extends AppCompatActivity {
     Button btn_register;
-    TextInputLayout ip_username,ip_fullname,ip_password,ip_confirm_password,ip_email;
+    TextInputLayout ip_fullname,ip_password,ip_confirm_password,ip_email;
     TextView tv_signIn;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,7 +44,6 @@ public class RegisterActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
         //mapping
-        ip_username =findViewById(R.id.ip_username);
         ip_fullname =findViewById(R.id.ip_fullname);
         ip_password =findViewById(R.id.ip_password);
         ip_confirm_password =findViewById(R.id.ip_repeat_password);
@@ -68,20 +69,13 @@ public class RegisterActivity extends AppCompatActivity {
     }
     private void clickToRegisterUser(View v) {
         ProgressDialog dialog = new ProgressDialog(RegisterActivity.this);
-
-        String username = ip_username.getEditText().getText().toString().trim();
+        if(!validateInput()){
+            return;
+        }
         String fullname = ip_fullname.getEditText().getText().toString().trim();
         String password = ip_password.getEditText().getText().toString().trim();
         String email = ip_email.getEditText().getText().toString().trim();
-        String confirm_password = ip_confirm_password.getEditText().getText().toString().trim();
 
-        if(validateInput()){
-            if(!password.equals(confirm_password)){
-                ip_confirm_password.setError("Mật khẩu không chính xác");
-                return;
-            }else{
-                ip_confirm_password.setError(null);
-            }
 
             dialog.setMessage("Loading...");
             dialog.show();
@@ -89,7 +83,6 @@ public class RegisterActivity extends AppCompatActivity {
             User user = new User();
             user.setFullName(fullname);
             user.setEmail(email);
-            user.setUsername(username);
             user.setPassword(password);
             user.setRole(1);
 
@@ -117,18 +110,6 @@ public class RegisterActivity extends AppCompatActivity {
                             // Sử dụng lớp mô hình (model class) để chuyển đổi dữ liệu phản hồi thành đối tượng tương ứng
                             AppMessage errorResponse = gson.fromJson(errorJson, AppMessage.class);
                             String message = errorResponse.getMessage();
-                            //Hiện thị lỗi tại các input tương ứng
-                            if(response.code()== 409){
-                                ip_username.setError(message);
-                            }else{
-                                ip_username.setError(null);
-                            }
-
-                            if(response.code() == 400){
-                                ip_email.setError(message);
-                            }else{
-                                ip_email.setError(null);
-                            }
 
                             // Sử dụng giá trị message
                             Toast.makeText(RegisterActivity.this,message,Toast.LENGTH_SHORT).show();
@@ -147,7 +128,6 @@ public class RegisterActivity extends AppCompatActivity {
                     Toast.makeText(RegisterActivity.this, "Register failed!", Toast.LENGTH_SHORT).show();
                 }
             });
-        }
     }
 
     private void clickBackLogin(){
@@ -156,20 +136,50 @@ public class RegisterActivity extends AppCompatActivity {
     }
 
     private boolean validateInput() {
-
-        String username = ip_username.getEditText().getText().toString().trim();
         String fullname = ip_fullname.getEditText().getText().toString().trim();
         String password = ip_password.getEditText().getText().toString().trim();
         String email = ip_email.getEditText().getText().toString().trim();
         String confirm_password = ip_confirm_password.getEditText().getText().toString().trim();
 
-        if(CheckInput.validateInput(username,ip_username) &&
-                CheckInput.validateInput(fullname,ip_fullname) &&
-                CheckInput.validateInput(password,ip_password) &&
-                CheckInput.validateInput(email,ip_email) &&
-                CheckInput.validateInput(confirm_password,ip_confirm_password)){
-            return true;
+        if(TextUtils.isEmpty(fullname)){
+            ip_fullname.setError("Please input your full name!");
+            return false;
+        }else{
+            ip_fullname.setError(null);
+
         }
-        return false;
+        if(TextUtils.isEmpty(email)){
+            ip_email.setError("Please input your email!");
+            return false;
+        }else if(!Patterns.EMAIL_ADDRESS.matcher(email).matches()){
+            ip_email.setError("Invaild email address!");
+            return false;
+        }else{
+            ip_email.setError(null);
+
+        }
+        if(TextUtils.isEmpty(password)){
+            ip_password.setError("Please input your password!");
+            return false;
+        }else if(password.length()<6){
+            ip_password.setError("Password need more 6 characters!");
+            return false;
+        }else{
+            ip_password.setError(null);
+
+        }
+        if(TextUtils.isEmpty(confirm_password)){
+            ip_confirm_password.setError("Please input your password!");
+            return false;
+        }else if(confirm_password.length()<6){
+            ip_confirm_password.setError("Password need more 6 characters!");
+            return false;
+        }else if(!confirm_password.equals(password)){
+            ip_confirm_password.setError("Password don't match!");
+            return false;
+        }else{
+            ip_confirm_password.setError(null);
+        }
+        return true;
     }
 }

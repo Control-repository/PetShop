@@ -76,9 +76,12 @@ public class PasswordFragment extends Fragment {
     }
 
     private void sendToChangePassword() {
+        if(!validateInput()){
+            return;
+        }
         String newPassword = ip_new_password.getEditText().getText().toString().trim();
-        if(validateInput()){
-            ProgressDialog dialog =new ProgressDialog(requireContext());
+
+        ProgressDialog dialog =new ProgressDialog(requireContext());
             dialog.setMessage("Loading...");
 
             RetroClient.setContext(requireContext());
@@ -93,6 +96,8 @@ public class PasswordFragment extends Fragment {
                     if(response.isSuccessful()){
                         Toast.makeText(requireContext(), response.body().getMessage(), Toast.LENGTH_SHORT).show();
                         clearText();
+                        thisUser.setPassword(newPassword);
+                        userViewModel.setUserData(thisUser);
                     }
                 }
 
@@ -102,7 +107,6 @@ public class PasswordFragment extends Fragment {
                     Toast.makeText(requireContext(), "Something wrong!", Toast.LENGTH_SHORT).show();
                 }
             });
-        }
     }
 
     private boolean validateInput(){
@@ -111,29 +115,34 @@ public class PasswordFragment extends Fragment {
         String checkPassword = ip_check_password.getEditText().getText().toString().trim();
 
         if(TextUtils.isEmpty(oldPassword)){
-            ip_password.setError("Vui lòng điền mật khẩu hiện tại");
+            ip_password.setError("Please input your current password!");
             return false;
         }else if(thisUser!=null && !oldPassword.equals(thisUser.getPassword())){
-                    ip_password.setError("Mật khẩu hiện tại không đúng!");
+                    ip_password.setError("Password don't match!");
                     return false;
-        }else {
+        }else{
             ip_password.setError(null);
+
         }
         if(TextUtils.isEmpty(newPassword)){
-            ip_new_password.setError("Vui lòng điền mật khẩu hiện mới!");
+            ip_new_password.setError("Please input your new password!");
+            return false;
+        }else if(newPassword.length()<6){
+            ip_new_password.setError("Password need more 6 characters!");
             return false;
         }else{
             ip_new_password.setError(null);
         }
         if(TextUtils.isEmpty(checkPassword)){
-            ip_check_password.setError("Vui lòng điền mật khẩu hiện mới!");
+            ip_check_password.setError("Please input your new password!");
             return false;
         }else if(!newPassword.equals(checkPassword)){
-            ip_check_password.setError("Mật khẩu không trùng khớp!");
+            ip_check_password.setError("New password don't mach!");
             return false;
         }else{
             ip_check_password.setError(null);
         }
+
 
         return true;
     }

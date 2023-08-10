@@ -26,7 +26,7 @@ public interface ApiService {
     //Kiểm tra đăng nhập
     @FormUrlEncoded
     @POST("/auth/signin")
-    Call<AppMessage> signIn(@Field("username") String username, @Field("password") String password);
+    Call<AppMessage> signIn(@Field("email") String username, @Field("password") String password);
     @GET("/auth/logout")
     Call<Void> getLogout();
     //Reset Password user khi quên
@@ -54,8 +54,8 @@ public interface ApiService {
     @PUT("/auth/update/password")
     Call<AppMessage> setUserPassword(@Field("password")String password);
     //Delete user
-    @DELETE("/auth/delete/user/{username}")
-    Call<AppMessage> deleteUser(@Path("username")String username);
+    @DELETE("/auth/delete/user/{email}")
+    Call<AppMessage> deleteUser(@Path("email")String username);
     /*
     * Gọi bên phía sản phẩm
     */

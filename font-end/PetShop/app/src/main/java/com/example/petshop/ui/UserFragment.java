@@ -46,7 +46,6 @@ public class UserFragment extends Fragment {
     private UserViewModel userViewModel;
     public UserFragment(){
     }
-    private static boolean isOpen =false;
     private TextInputLayout ip_fullname,ip_email,ip_phone;
     private Button btn_change;
     private ApiService apiService ;
@@ -193,7 +192,7 @@ public class UserFragment extends Fragment {
     //Xóa nguời dùng hiện tại và logout ra màn hình đăng nhập
     private void sendToDeleteUser(){
         if(thisUser!=null){
-            Call<AppMessage> call = apiService.deleteUser(thisUser.getUsername());
+            Call<AppMessage> call = apiService.deleteUser(thisUser.getEmail());
             call.enqueue(new Callback<AppMessage>() {
                 @Override
                 public void onResponse(Call<AppMessage> call, Response<AppMessage> response) {

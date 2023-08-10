@@ -10,14 +10,8 @@ User.getAll = async () => {
 };
 //get all user but not get user cureent
 User.getAllCurrent = async (username) => {
-  let questionQuery = `SELECT * FROM users WHERE username <> ?`;
+  let questionQuery = `SELECT * FROM users WHERE email <> ?`;
 
-  return await query(questionQuery, [username]);
-};
-
-//get user by username
-User.getByUsername = async (username) => {
-  let questionQuery = "SELECT * FROM users WHERE username =?";
   return await query(questionQuery, [username]);
 };
 
@@ -29,47 +23,39 @@ User.getByEmail = async (email) => {
 
 User.insert = async (data) => {
   let questionQuery =
-    "INSERT INTO users(username,password,fullname,email,phone,role) VALUES(?,?,?,?,?,?)";
+    "INSERT INTO users(email,password,fullname,phone,role) VALUES(?,?,?,?,?)";
   const values = [
-    data.username,
+    data.email,
     data.password,
     data.fullname,
-    data.email,
     data.phone,
     data.role,
   ];
   return await query(questionQuery, values);
 };
 
-User.updatePassword = async (username, newPassword) => {
-  let questionQuery = "UPDATE users SET password=? WHERE username=?";
-  return await query(questionQuery, [newPassword, username]);
+User.updatePassword = async (email, newPassword) => {
+  let questionQuery = "UPDATE users SET password=? WHERE email=?";
+  return await query(questionQuery, [newPassword, email]);
 };
 
 User.update = async (data) => {
-  let questionQuery =
-    "UPDATE users SET email=?,phone=?,fullname=? WHERE username=?";
-  return await query(questionQuery, [
-    data.email,
-    data.phone,
-    data.fullname,
-    data.username,
-  ]);
+  let questionQuery = "UPDATE users SET phone=?,fullname=? WHERE email=?";
+  return await query(questionQuery, [data.phone, data.fullname, data.email]);
 };
 User.updateAll = async (data) => {
   let questionQuery =
-    "UPDATE users SET email=?,phone=?,fullname=?,password=? WHERE username=?";
+    "UPDATE users SET phone=?,fullname=?,password=? WHERE email=?";
   return await query(questionQuery, [
-    data.email,
     data.phone,
     data.fullname,
     data.password,
-    data.username,
+    data.email,
   ]);
 };
 
-User.remove = async (username) => {
-  let questionQuery = "DELETE FROM users WHERE username =?";
-  return await query(questionQuery, [username]);
+User.remove = async (email) => {
+  let questionQuery = "DELETE FROM users WHERE email =?";
+  return await query(questionQuery, [email]);
 };
 module.exports = User;

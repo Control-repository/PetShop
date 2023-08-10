@@ -11,7 +11,7 @@ const protect = async (req, res, next) => {
     // Verify Token
     const verified = jwt.verify(token, process.env.JWT_SECRET);
 
-    const user = await User.getByUsername(verified.id);
+    const user = await User.getByEmail(verified.id);
     if (!user) {
       return res.status(401).json({ message: "User not found" });
     }

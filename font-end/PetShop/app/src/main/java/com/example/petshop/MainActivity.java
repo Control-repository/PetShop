@@ -62,7 +62,7 @@ public class MainActivity extends AppCompatActivity {
             User user =(User) bundle.getSerializable("User");
             userViewModel.setUserData(user);
             fullname.setText(user.getFullName());
-            username.setText(user.getUsername());
+            username.setText(user.getEmail());
         }
 
 

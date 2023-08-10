@@ -8,7 +8,9 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.util.Log;
+import android.util.Patterns;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
@@ -64,7 +66,9 @@ public class LoginActivity extends AppCompatActivity {
         String username = ip_username.getEditText().getText().toString().trim();
         String password = ip_password.getEditText().getText().toString().trim();
 
-        if(CheckInput.validateInput(username,ip_username)&& CheckInput.validateInput(password,ip_password)){
+        if(!validate()){
+            return;
+        }
             dialog.setMessage("Loading...");
             dialog.show();
             //truyền context
@@ -123,8 +127,25 @@ public class LoginActivity extends AppCompatActivity {
                     Toast.makeText(LoginActivity.this, "Login Failed!", Toast.LENGTH_SHORT).show();
                 }
             });
-        }
     }
 
+    private boolean validate(){
+        String username = ip_username.getEditText().getText().toString().trim();
+        String password = ip_password.getEditText().getText().toString().trim();
+        if(TextUtils.isEmpty(username)){
+            ip_username.setError("Please input your email!");
+            return false;
+        }else if(!Patterns.EMAIL_ADDRESS.matcher(username).matches()){
+            ip_username.setError("Invalid email address!");
+            return false;
+        }
+        if(TextUtils.isEmpty(password)){
+            ip_password.setError("Please input your password!");
+            return false;
+        }
+        ip_password.setError(null);
+        ip_username.setError(null);
 
+        return true;
+    }
 }

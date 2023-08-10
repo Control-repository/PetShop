@@ -165,7 +165,7 @@ public class CustomerFragment extends Fragment {
             public void onClick(DialogInterface dialog, int which) {
                 RetroClient.setContext(requireContext());
                 ApiService apiService = RetroClient.getApiService();
-                Call<AppMessage> call = apiService.deleteUser(user.getUsername());
+                Call<AppMessage> call = apiService.deleteUser(user.getEmail());
 
                 call.enqueue(new Callback<AppMessage>() {
                     @Override

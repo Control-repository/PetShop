@@ -2,12 +2,12 @@ const route = require("express")();
 const auth = require("../controllers/authController.js");
 const protect = require("../middleware/authMiddleware");
 route.post("/signin", async (req, res) => {
-  const { username, password } = req.body;
+  const { email, password } = req.body;
   try {
-    const user = await auth.loginUser(username, password);
+    const user = await auth.loginUser(email, password);
 
     if (user) {
-      const token = auth.generateToken(username);
+      const token = auth.generateToken(email);
 
       res.cookie("token", token, {
         path: `/`,
@@ -46,9 +46,9 @@ route.put("/update/infor", protect, auth.updateInfor);
 //update password for current user
 route.put("/update/password", protect, auth.updatePassword);
 //update all innformation
-route.put("/udpate/all/:username", protect, auth.updateAll);
+route.put("/udpate/all/:email", protect, auth.updateAll);
 //delete user
-route.delete("/delete/user/:username", protect, auth.deleteUser);
+route.delete("/delete/user/:email", protect, auth.deleteUser);
 //logout
 route.get("/logout", auth.logout);
 module.exports = route;
